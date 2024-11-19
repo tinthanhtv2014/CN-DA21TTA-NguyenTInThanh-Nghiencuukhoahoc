@@ -314,7 +314,7 @@ const DangKyDanhMucGioChuan = ({
   // -------------SEARCH EMAIL---------------------------------
   useEffect(() => {
     const fetchEmailSuggestionsTrongTruong = async () => {
-      if (searchTerm.length > 0) {
+      if (searchTerm) {
         if (searchTerm.trim() === "") {
           setEmailSuggestions([]); // Nếu từ khóa rỗng, xóa gợi ý
           return;
