@@ -46,6 +46,11 @@ const navConfig = [
     path: "/theo-doi-dang-ky",
     icon: icon("ic_blog"),
   },
+  {
+    title: "Danh sách giảng viên đăng ký",
+    path: "/danhsachgiangvien",
+    icon: icon("ic_blog"),
+  },
 ];
 
 export default navConfig;

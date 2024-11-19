@@ -314,17 +314,18 @@ const DangKyDanhMucGioChuan = ({
   // -------------SEARCH EMAIL---------------------------------
   useEffect(() => {
     const fetchEmailSuggestionsTrongTruong = async () => {
-      if (searchTerm) {
+      if (searchTerm.length > 0) {
         if (searchTerm.trim() === "") {
           setEmailSuggestions([]); // Nếu từ khóa rỗng, xóa gợi ý
           return;
         }
-
+        console.log(" check rđấe => ", searchTerm);
         try {
           const response = await CookiesAxios.post(
             `${process.env.REACT_APP_URL_SERVER}/api/v1/truongkhoa/timkiem/email`,
             {
-              TENGV: searchTerm,
+              TENGIANGVIEN: searchTerm,
+              TEN_NAM_HOC: selectNamHoc,
             }
           );
           console.log(" check re => ", response.data.DT);

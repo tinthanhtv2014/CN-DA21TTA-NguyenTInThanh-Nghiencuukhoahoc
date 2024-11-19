@@ -127,13 +127,23 @@ const timkiem_email_taikhoan = async (TENGV, MANAMHOC) => {
     console.log(TENGV);
     console.log(MANAMHOC);
     const connection = await pool.getConnection();
-    const query =
-      "SELECT k.TENKHOA, bomon.TENBOMON, giangvien.MAGV, giangvien.TENGV ,khunggiochuan.*,taikhoan.TENDANGNHAP FROM giangvien,namhoc ,taikhoan,chon_khung,khunggiochuan, khoa as k , bomon,bangphancong WHERE namhoc.MANAMHOC = chon_khung.MANAMHOC and chon_khung.MAGV = giangvien.MAGV and chon_khung.MAKHUNG = khunggiochuan.MAKHUNG and k.MAKHOA = bomon.MAKHOA and bomon.MABOMON = giangvien.MABOMON and taikhoan.MAGV = giangvien.MAGV and chon_khung.MAGV is not null and namhoc.TENNAMHOC = ? and giangvien.TENGV LIKE ? LIMIT 5";
+    const query = `SELECT k.TENKHOA, bomon.TENBOMON, giangvien.MAGV, giangvien.TENGV ,khunggiochuan.*,taikhoan.TENDANGNHAP 
+      FROM giangvien,namhoc ,taikhoan,chon_khung,khunggiochuan, khoa as k , bomon,bangphancong 
+      WHERE namhoc.MANAMHOC = chon_khung.MANAMHOC 
+      and chon_khung.MAGV = giangvien.MAGV 
+      and chon_khung.MAKHUNG = khunggiochuan.MAKHUNG 
+      and k.MAKHOA = bomon.MAKHOA 
+      and bomon.MABOMON = giangvien.MABOMON 
+      and taikhoan.MAGV = giangvien.MAGV 
+      and chon_khung.MAGV is not null 
+      and namhoc.TENNAMHOC = ?
+      and giangvien.TENGV LIKE ? LIMIT 5`;
     const [rows] = await connection.execute(query, [
       `${MANAMHOC}`,
       `%${TENGV}%`,
     ]);
     connection.release();
+    console.log(rows);
     if (rows.length > 0) {
       return {
         EM: "Tìm thấy các email gần đúng",

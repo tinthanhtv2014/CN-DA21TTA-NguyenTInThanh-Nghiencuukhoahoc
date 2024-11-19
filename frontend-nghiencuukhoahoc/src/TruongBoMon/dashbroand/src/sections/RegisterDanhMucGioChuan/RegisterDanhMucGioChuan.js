@@ -63,7 +63,7 @@ const DangKyDanhMucGioChuan = ({
     },
   ]);
   const [emailSuggestions, setEmailSuggestions] = useState([]);
-  const [searchTerm, setSearchTerm] = useState(null); // Từ khóa tìm kiếm
+  const [searchTerm, setSearchTerm] = useState(""); // Từ khóa tìm kiếm
 
   const [SearchTermNgoaiTruong, setSearchTermNgoaiTruong] = useState(null);
   const [LoaiTacGia, setLoaiTacGia] = useState([]);
@@ -118,7 +118,7 @@ const DangKyDanhMucGioChuan = ({
     const decoded = jwtDecode(token);
     // console.log("check decoded", decoded.taikhoan);
 
-    if (selectNamHoc.length && decoded) {
+    if (selectNamHoc.length > 0 && decoded) {
       const fectDataThongTinGioNghienCuu = async () => {
         try {
           const response_Data = await CookiesAxios.post(
@@ -272,18 +272,18 @@ const DangKyDanhMucGioChuan = ({
         (tacGia, i) =>
           i === index
             ? {
-              loai: "",
-              khoa: "",
-              boMon: "",
-              maSoGV: "",
-              tenGV: "",
-              emailGV: "",
-              searchTerm: "",
-              laVienChuc: !isNgoaiTruong,
-              duocMien: false,
-              soGio: "",
-              soPhanTram: "",
-            } // Reset thông tin giảng viên tại index
+                loai: "",
+                khoa: "",
+                boMon: "",
+                maSoGV: "",
+                tenGV: "",
+                emailGV: "",
+                searchTerm: "",
+                laVienChuc: !isNgoaiTruong,
+                duocMien: false,
+                soGio: "",
+                soPhanTram: "",
+              } // Reset thông tin giảng viên tại index
             : tacGia // Giữ nguyên các giảng viên khác
       )
     );
@@ -306,6 +306,7 @@ const DangKyDanhMucGioChuan = ({
   const handleTacGiaChangeEmail = (index, field, value) => {
     setCurrentEmail(value);
     // console.log("check ", value);
+    console.log("tacGia.tenGV:", field);
     const newTacGiaList = [...tacGiaList];
     newTacGiaList[index][field] = value;
     setTacGiaList(newTacGiaList);
@@ -315,6 +316,7 @@ const DangKyDanhMucGioChuan = ({
   useEffect(() => {
     const fetchEmailSuggestionsTrongTruong = async () => {
       if (searchTerm) {
+        console.log("check search", searchTerm);
         if (searchTerm.trim() === "") {
           setEmailSuggestions([]); // Nếu từ khóa rỗng, xóa gợi ý
           return;
@@ -324,7 +326,8 @@ const DangKyDanhMucGioChuan = ({
           const response = await CookiesAxios.post(
             `${process.env.REACT_APP_URL_SERVER}/api/v1/truongkhoa/timkiem/email`,
             {
-              TENGV: searchTerm,
+              TENGIANGVIEN: searchTerm,
+              TEN_NAM_HOC: selectNamHoc,
             }
           );
           console.log(" check re => ", response.data.DT);
@@ -790,7 +793,7 @@ const DangKyDanhMucGioChuan = ({
                                     }
                                   >
                                     {data_BoMon[index] &&
-                                      data_BoMon[index].length > 0 ? (
+                                    data_BoMon[index].length > 0 ? (
                                       (data_BoMon[index] || []).map((loai) => (
                                         <MenuItem
                                           key={loai.MABOMON}

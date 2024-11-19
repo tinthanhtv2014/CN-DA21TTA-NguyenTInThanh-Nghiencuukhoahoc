@@ -25,7 +25,7 @@ const { GOI_Y_SERVER, GOI_Y_SERVER_rf } = require("../../utils/controllerTEST");
 const { checkUserJWT } = require("../../middlewares/JWTAction");
 const TruongKhoaRoute = (app) => {
   router.get("/xem", checkUserJWT, GiangVien_thuoc_KhoaController);
-  router.post("/timkiem/email", checkUserJWT, timkiem_email_taikhoanController);
+  router.post("/timkiem/email", timkiem_email_taikhoanController);
   router.post(
     "/timkiem/ngoaitruong/email",
     checkUserJWT,
@@ -33,8 +33,11 @@ const TruongKhoaRoute = (app) => {
   );
   router.post("/test/tao/excel", checkUserJWT, CoTyLeExcelController); // Chạy CSDL bằng excel
   // router.post("/test/phancong", checkUserJWT, PhanCongControllerTest);
-  router.post("/test/phancong", checkUserJWT, Training_RandomForestControllerTest);
-
+  router.post(
+    "/test/phancong",
+    checkUserJWT,
+    Training_RandomForestControllerTest
+  );
 
   // router.post("/test/python", checkUserJWT, Training_RandomForestControllerTest);
 
