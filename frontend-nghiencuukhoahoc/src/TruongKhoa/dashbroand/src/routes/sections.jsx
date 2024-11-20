@@ -85,11 +85,11 @@ export default function Router() {
       ),
     },
     {
-      path: "/test",
+      path: "/tai-khoan-giangvien/thong-tin",
       element: (
         <DashboardLayout>
           <Suspense fallback={<div>Loading...</div>}>
-            <FileExcel />
+            <AccountGV />
           </Suspense>
         </DashboardLayout>
       ),

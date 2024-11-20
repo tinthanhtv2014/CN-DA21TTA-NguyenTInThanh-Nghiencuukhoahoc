@@ -228,6 +228,25 @@ export default function Router() {
       ),
     },
     {
+      path: "/tai-khoan-giangvien/thong-tin",
+      element: (
+        <DashboardLayout>
+          <Suspense
+            fallback={
+              <Skeleton
+                variant="rectangular"
+                width="100%"
+                height="100%"
+                sx={{ bgcolor: "grey.300" }}
+              />
+            }
+          >
+            <AccountGV />
+          </Suspense>
+        </DashboardLayout>
+      ),
+    },
+    {
       path: "/login",
       element: <LoginPage />,
     },
