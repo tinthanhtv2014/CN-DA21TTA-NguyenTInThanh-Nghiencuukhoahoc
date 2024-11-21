@@ -131,14 +131,24 @@ const CRUDgiangvien_CNTT = (app) => {
     // try {
     const TENNAMHOC = req.body.TENNAMHOC;
     let [results_ctdt_bomon, fields1] = await pool.execute(
-      `SELECT giangvien.*, namhoc.TENNAMHOC, COUNT(dang_ky_thuc_hien_quy_doi.TEN_DE_TAI) AS SoLuongDeTai
-FROM giangvien
-JOIN dang_ky_thuc_hien_quy_doi 
+      `SELECT 
+    giangvien.*, 
+    namhoc.TENNAMHOC, 
+    COUNT(dang_ky_thuc_hien_quy_doi.TEN_DE_TAI) AS SoLuongDeTai,
+    GROUP_CONCAT(dang_ky_thuc_hien_quy_doi.TEN_DE_TAI SEPARATOR ', ') AS DanhSachDeTai
+FROM 
+    giangvien
+JOIN 
+    dang_ky_thuc_hien_quy_doi 
     ON giangvien.MAGV = dang_ky_thuc_hien_quy_doi.MAGV
-JOIN namhoc 
+JOIN 
+    namhoc 
     ON namhoc.MANAMHOC = dang_ky_thuc_hien_quy_doi.MANAMHOC
-WHERE namhoc.TENNAMHOC = ?
-GROUP BY giangvien.MAGV, giangvien.TENGV, namhoc.TENNAMHOC;`,
+WHERE 
+    namhoc.TENNAMHOC = ?
+GROUP BY 
+    giangvien.MAGV, giangvien.TENGV, namhoc.TENNAMHOC;
+`,
       [TENNAMHOC]
     );
     return res.status(200).json({
@@ -157,22 +167,16 @@ GROUP BY giangvien.MAGV, giangvien.TENGV, namhoc.TENNAMHOC;`,
     const TENNAMHOC = req.body.TENNAMHOC;
     let [results_ctdt_bomon, fields1] = await pool.execute(
       `SELECT 
-    giangvien.MAGV, 
-    giangvien.TENGV, 
-    namhoc.TENNAMHOC, 
-    dang_ky_thuc_hien_quy_doi.TEN_DE_TAI
+    giangvien.*
+
 FROM 
     giangvien
 LEFT JOIN 
     dang_ky_thuc_hien_quy_doi 
     ON giangvien.MAGV = dang_ky_thuc_hien_quy_doi.MAGV
-LEFT JOIN 
-    namhoc 
-    ON namhoc.MANAMHOC = dang_ky_thuc_hien_quy_doi.MANAMHOC
+    AND dang_ky_thuc_hien_quy_doi.MANAMHOC = (SELECT MANAMHOC FROM namhoc WHERE TENNAMHOC = ?)
 WHERE 
-    (namhoc.TENNAMHOC = ? OR namhoc.TENNAMHOC IS NULL)
-    AND dang_ky_thuc_hien_quy_doi.TEN_DE_TAI IS NULL;
-
+    dang_ky_thuc_hien_quy_doi.MAGV IS NULL;
 `,
       [TENNAMHOC]
     );
