@@ -320,6 +320,7 @@ const DangKyDanhMucGioChuan = ({
           return;
         }
         console.log(" check rđấe => ", searchTerm);
+        console.log(" check rđấeadasdadasd => ", selectNamHoc);
         try {
           const response = await CookiesAxios.post(
             `${process.env.REACT_APP_URL_SERVER}/api/v1/truongkhoa/timkiem/email`,
