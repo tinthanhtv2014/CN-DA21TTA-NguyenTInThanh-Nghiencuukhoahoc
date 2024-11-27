@@ -164,20 +164,33 @@ const RenderData = ({
           <Col md={6} className="row-with-border1">
             <Typography>
               {OpenChucNangtheokhungthoigian && (
-                <>
-                  {" "}
-                  <p className="text-open-gate">
-                    {startTime ? (
-                      <>
-                        Thời gian mở cổng từ:{" "}
-                        <span className="text-info ">{startTime}</span> đến{" "}
-                        <span className="text-info ">{endTime}</span>
-                      </>
-                    ) : (
-                      "Hiện đang đóng cổng đăng ký"
-                    )}
-                  </p>
-                </>
+                <Typography
+                  component="p"
+                  sx={{ fontSize: "1.3rem", margin: 0 }}
+                >
+                  {startTime ? (
+                    <>
+                      Thời gian mở cổng từ:{" "}
+                      <Typography
+                        component="span"
+                        sx={{ fontSize: "1.1rem" }}
+                        className="text-info"
+                      >
+                        {startTime}
+                      </Typography>{" "}
+                      đến{" "}
+                      <Typography
+                        component="span"
+                        sx={{ fontSize: "1.1rem" }}
+                        className="text-info"
+                      >
+                        {endTime}
+                      </Typography>
+                    </>
+                  ) : (
+                    "Hiện đang đóng cổng đăng ký"
+                  )}
+                </Typography>
               )}
             </Typography>
           </Col>{" "}
@@ -241,6 +254,7 @@ const RenderData = ({
                   onChange={(e) => setSelectNamhoc(e.target.value)}
                   variant="outlined"
                 >
+                  <MenuItem value="Tất cả">Tất cả</MenuItem>
                   {dataListNamHoc && dataListNamHoc.length > 0 ? (
                     dataListNamHoc.map((namhoc, index) => (
                       <MenuItem key={index} value={namhoc.TENNAMHOC}>
@@ -272,25 +286,12 @@ const RenderData = ({
                       <i className="fas fa-times"></i>
                     </Button>
                   </Col>
-                  <Col>
-                    <Button
-                      variant="contained"
-                      onClick={handleSelectKhungGioChuan}
-                    >
-                      Xác Nhận
-                    </Button>
-                  </Col>
                 </>
               ) : (
                 <>
                   <Col>
                     <Button variant="outlined" color="secondary" disabled>
                       Bạn chưa chọn khung giờ chuẩn
-                    </Button>
-                  </Col>
-                  <Col>
-                    <Button variant="contained" disabled>
-                      Xác Nhận
                     </Button>
                   </Col>
                 </>
@@ -328,7 +329,7 @@ const RenderData = ({
                   <TableCell align="center">
                     Giờ phục vụ cộng đồng chuẩn
                   </TableCell>
-                  <TableCell align="center">Ghi Chú</TableCell>
+                  <TableCell align="center">Năm Học</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -368,7 +369,7 @@ const RenderData = ({
                         {khungChuan.GIOPHUCVUCONGDONG_CHUAN ?? ""}
                       </TableCell>
                       <TableCell align="center">
-                        {khungChuan.GHICHU ?? ""}
+                        {khungChuan.TENNAMHOC ?? ""}
                       </TableCell>
                     </TableRow>
                   ))
@@ -382,6 +383,41 @@ const RenderData = ({
               </TableBody>
             </Table>
           </TableContainer>
+        </Row>
+        <Row>
+          {isOpenButtonSelectKhung ? (
+            <>
+              {" "}
+              {SelectKhungGioChuan ? (
+                <>
+                  <Col></Col>
+                  <Col></Col>
+                  <Col style={{ textAlign: "right" }}>
+                    <Button
+                      variant="contained"
+                      onClick={handleSelectKhungGioChuan}
+                    >
+                      Xác Nhận
+                    </Button>
+                  </Col>
+                </>
+              ) : (
+                <>
+                  <Col style={{ textAlign: "right" }}>
+                    <Button variant="contained" disabled>
+                      Xác Nhận
+                    </Button>
+                  </Col>
+                </>
+              )}
+            </>
+          ) : (
+            <>
+              {" "}
+              <Col></Col>
+              <Col></Col>
+            </>
+          )}
         </Row>
       </Container>{" "}
     </>

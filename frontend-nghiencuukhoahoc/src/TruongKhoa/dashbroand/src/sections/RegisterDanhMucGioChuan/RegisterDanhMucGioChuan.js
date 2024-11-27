@@ -39,7 +39,7 @@ const DangKyDanhMucGioChuan = ({
   endTimeGate,
 }) => {
   const [IsOpenSelectOption, setIsOpenSelectOption] = useState(
-    "Xem Lịch Sử Đăng Ký Danh Mục"
+    "Xem lịch sử đăng ký nghiên cứu"
   );
   const [TenDeTaiNghienCuu, setTenDeTaiNghienCuu] = useState("");
   const navigate = useNavigate();
@@ -141,9 +141,9 @@ const DangKyDanhMucGioChuan = ({
   }, [selectNamHoc]);
 
   useEffect(() => {
-    if (IsOpenSelectOption === "Đăng Ký Danh Mục") {
+    if (IsOpenSelectOption === "Đăng ký nghiên cứu") {
       setIsDisableNamHoc(true);
-    } else if (IsOpenSelectOption === "Xem Lịch Sử Đăng Ký Danh Mục") {
+    } else if (IsOpenSelectOption === "Xem lịch sử đăng ký nghiên cứu") {
       setIsDisableNamHoc(false);
       const DataThongTinDangKyGiangVien = async () => {
         if (selectNamHoc.length > 0 && MaGV) {
@@ -319,7 +319,8 @@ const DangKyDanhMucGioChuan = ({
           setEmailSuggestions([]); // Nếu từ khóa rỗng, xóa gợi ý
           return;
         }
-
+        console.log(" check rđấe => ", searchTerm);
+        console.log(" check rđấeadasdadasd => ", selectNamHoc);
         try {
           const response = await CookiesAxios.post(
             `${process.env.REACT_APP_URL_SERVER}/api/v1/truongkhoa/timkiem/email`,
@@ -543,22 +544,20 @@ const DangKyDanhMucGioChuan = ({
             {/* <Col md={4}></Col> */}
             <Col md={5} className="row-with-border-danhmuc-gate ml-4">
               {IsOpenCheckKhoa ? (
-                <>
-                  {" "}
-                  <p className="text-open-gate ">
-                    Thời gian mở cổng từ đăng ký &nbsp;
-                    <span className="text-info">{startTimeGate}</span>
-                    &nbsp;đến&nbsp;
-                    <span className="text-info">{endTimeGate}</span>
-                  </p>
-                </>
+                <p className="text-open-gate" style={{ fontSize: "1.1rem" }}>
+                  Thời gian mở cổng từ: &nbsp;
+                  <span className="text-info" style={{ fontSize: "1.1rem" }}>
+                    {startTimeGate}
+                  </span>
+                  &nbsp;đến&nbsp;
+                  <span className="text-info" style={{ fontSize: "1.1rem" }}>
+                    {endTimeGate}
+                  </span>
+                </p>
               ) : (
-                <>
-                  {" "}
-                  <p className="text-open-gate ">
-                    Hiện tại khoa của bạn chưa mở cổng đăng ký
-                  </p>
-                </>
+                <p className="text-open-gate" style={{ fontSize: "1.1rem" }}>
+                  Hiện tại khoa của bạn chưa mở cổng đăng ký
+                </p>
               )}
             </Col>
           </Row>{" "}
@@ -622,27 +621,38 @@ const DangKyDanhMucGioChuan = ({
               {" "}
               <Typography>
                 {SoGioNghienCuuChuan ? (
-                  <p className="text-open-gate">
+                  <p className="text-open-gate" style={{ fontSize: "1.1rem" }}>
                     {" "}
-                    Số Giờ Nghiên Cứu Khoa Học Chuẩn Của Bạn Là:{" "}
-                    <span className=" color-text">{SoGioNghienCuuChuan}</span>
+                    Số Giờ Của Bạn Là:{" "}
+                    <span
+                      className=" color-text"
+                      style={{ fontSize: "1.1rem" }}
+                    >
+                      {SoGioNghienCuuChuan}
+                    </span>
                   </p>
                 ) : (
-                  <p className="text-open-gate text-center">
+                  <p
+                    className="text-open-gate text-center"
+                    style={{ fontSize: "1.1rem" }}
+                  >
                     Bạn chưa chọn khung cho năm nay
                   </p>
                 )}
               </Typography>
             </Col>
           </Row>
-          {IsOpenSelectOption === "Đăng Ký Danh Mục" ? (
+          {IsOpenSelectOption === "Đăng ký nghiên cứu" ? (
             <>
               {" "}
               {/* START----------------Tên Đề Tài--------------------------- */}
               <Row>
                 <Col md={7} className="row-with-border-danhmuc">
                   <Col md={4}>
-                    <Typography className="text-open-gate detai-b responsive-tendetai">
+                    <Typography
+                      className="text-open-gate detai-b responsive-tendetai"
+                      sx={{ fontSize: "1.1rem !important" }}
+                    >
                       Nhập Tên Đề Tài
                     </Typography>
                   </Col>
@@ -659,7 +669,10 @@ const DangKyDanhMucGioChuan = ({
 
                 <Col md={4} className="row-with-border-danhmuc d-flex detai-a">
                   {/* <p className="text-tendetai "></p> */}
-                  <Typography className="text-open-gate detai-b">
+                  <Typography
+                    className="text-open-gate detai-b"
+                    sx={{ fontSize: "0.9rem !important" }} // Đảm bảo độ ưu tiên cao
+                  >
                     {TenDeTaiNghienCuu
                       ? TenDeTaiNghienCuu
                       : "Bạn Chưa Nhập Tên Đề Tài Của Mình"}
@@ -678,7 +691,10 @@ const DangKyDanhMucGioChuan = ({
                   </Col>
                   <Col md={7}>
                     {" "}
-                    <p className="text-open-gate ml-4">
+                    <p
+                      className="text-open-gate ml-4"
+                      style={{ fontSize: "0.9rem" }}
+                    >
                       {selectedDanhMuc
                         ? selectedDanhMuc.NOI_DUNG_DANH_MUC
                         : `Mở modal để có thể chọn danh mục mà bạn mong muốn. Chọn
@@ -701,13 +717,19 @@ const DangKyDanhMucGioChuan = ({
                   </div>
                 </Col>
                 <Col md={4} className="row-with-border-danhmuc ">
-                  <div className="d-flex justify-content-between w-100 mb-2">
-                    <Typography className="text-open-gate">
+                  <div className="d-flex justify-content-between w-100">
+                    <Typography
+                      className="text-open-gate"
+                      sx={{ fontSize: "1.2rem !important" }}
+                    >
                       Số Giờ Chuẩn
                     </Typography>
                   </div>
                   <div className="d-flex justify-content-between w-100">
-                    <Typography className="text-open-gate color-text">
+                    <Typography
+                      className="text-open-gate color-text"
+                      sx={{ fontSize: "1.2rem !important" }}
+                    >
                       {selectedDanhMuc
                         ? selectedDanhMuc.GIO_CHUAN
                         : "Chưa Chọn Danh Mục"}
@@ -991,7 +1013,7 @@ const DangKyDanhMucGioChuan = ({
                               className="responsive-loaitacgia"
                             >
                               <InputLabel id={`loai-tac-gia-label-${index}`}>
-                                Loại Tác Giả {index + 1}
+                                Loại Tác Giả
                               </InputLabel>
                               <Select
                                 labelId={`loai-tac-gia-label-${index}`}

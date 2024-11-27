@@ -241,6 +241,7 @@ const RenderData = ({
                   onChange={(e) => setSelectNamhoc(e.target.value)}
                   variant="outlined"
                 >
+                  <MenuItem value="Tất cả">Tất cả</MenuItem>
                   {dataListNamHoc && dataListNamHoc.length > 0 ? (
                     dataListNamHoc.map((namhoc, index) => (
                       <MenuItem key={index} value={namhoc.TENNAMHOC}>
@@ -272,25 +273,12 @@ const RenderData = ({
                       <i className="fas fa-times"></i>
                     </Button>
                   </Col>
-                  <Col>
-                    <Button
-                      variant="contained"
-                      onClick={handleSelectKhungGioChuan}
-                    >
-                      Xác Nhận
-                    </Button>
-                  </Col>
                 </>
               ) : (
                 <>
                   <Col>
                     <Button variant="outlined" color="secondary" disabled>
                       Bạn chưa chọn khung giờ chuẩn
-                    </Button>
-                  </Col>
-                  <Col>
-                    <Button variant="contained" disabled>
-                      Xác Nhận
                     </Button>
                   </Col>
                 </>
@@ -328,7 +316,7 @@ const RenderData = ({
                   <TableCell align="center">
                     Giờ phục vụ cộng đồng chuẩn
                   </TableCell>
-                  <TableCell align="center">Ghi Chú</TableCell>
+                  <TableCell align="center">Năm học</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -368,7 +356,7 @@ const RenderData = ({
                         {khungChuan.GIOPHUCVUCONGDONG_CHUAN ?? ""}
                       </TableCell>
                       <TableCell align="center">
-                        {khungChuan.GHICHU ?? ""}
+                        {khungChuan.TENNAMHOC ?? ""}
                       </TableCell>
                     </TableRow>
                   ))
@@ -382,6 +370,41 @@ const RenderData = ({
               </TableBody>
             </Table>
           </TableContainer>
+        </Row>
+        <Row className="mt-4">
+          {isOpenButtonSelectKhung ? (
+            <>
+              {" "}
+              {SelectKhungGioChuan ? (
+                <>
+                  <Col></Col>
+                  <Col></Col>
+                  <Col style={{ textAlign: "right" }}>
+                    <Button
+                      variant="contained"
+                      onClick={handleSelectKhungGioChuan}
+                    >
+                      Xác Nhận
+                    </Button>
+                  </Col>
+                </>
+              ) : (
+                <>
+                  <Col style={{ textAlign: "right" }}>
+                    <Button variant="contained" disabled>
+                      Xác Nhận
+                    </Button>
+                  </Col>
+                </>
+              )}
+            </>
+          ) : (
+            <>
+              {" "}
+              <Col></Col>
+              <Col></Col>
+            </>
+          )}
         </Row>
       </Container>{" "}
       <ModalMoCongDangKy
