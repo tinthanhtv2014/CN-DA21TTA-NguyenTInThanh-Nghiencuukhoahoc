@@ -12,9 +12,12 @@ import {
   TextField,
   Checkbox,
   FormControlLabel,
+  Grid,
 } from "@mui/material";
 import GVTableChuaChonKhung from "./component/GVTableChuaChonKhung";
 import GVTableDaChonKhung from "./component/GVTableDaChonKhung";
+import { jwtDecode } from "jwt-decode";
+import Cookies from "js-cookie";
 const IndexPhanCongGiangVien = () => {
   const [data_ListGVChuaChonKhung, setData_ListGVChuaChonKhung] = useState([]);
   const [data_ListGVDaChonKhung, setData_ListGVDaChonKhung] = useState([]);
@@ -25,7 +28,8 @@ const IndexPhanCongGiangVien = () => {
   const [isDisableNamHoc, setIsDisableNamHoc] = useState(false);
   const [isOpenXemGiangVienChonKhung, setIsOpenXemGiangVienChonKhung] =
     useState(true);
-
+  const [ListBomon, setListBomon] = useState(null);
+  const [selectBomon, setSelectBomon] = useState(null);
   useEffect(() => {
     const fetchNamHocList = async () => {
       try {
@@ -41,14 +45,31 @@ const IndexPhanCongGiangVien = () => {
         console.error("Error fetching NamHoc data:", error);
       }
     };
+    const fetchBomonList = async () => {
+      try {
+        const response_Bomon = await CookiesAxios.get(
+          `${process.env.REACT_APP_URL_SERVER}/api/v1/truongkhoa/allbomon`
+        );
+        console.log("check response_NamHoc", response_Bomon.data);
+        if (response_Bomon.data.EC === 1) {
+          setListBomon(response_Bomon.data.DT);
+          setSelectBomon(response_Bomon.data.DT[0].TENBOMON);
+        }
+      } catch (error) {
+        console.error("Error fetching NamHoc data:", error);
+      }
+    };
+
     fetchNamHocList();
+    fetchBomonList();
   }, []);
+
   useEffect(() => {
-    if (selectNamHoc) {
-      fetchGiangVienList(selectNamHoc);
-      fetchListGiangVienChuaChonKhung(selectNamHoc);
+    if (selectNamHoc && selectBomon) {
+      fetchGiangVienList(selectNamHoc, selectBomon); // Fetch giảng viên đã chọn khung
+      fetchListGiangVienChuaChonKhung(selectNamHoc, selectBomon); // Fetch giảng viên chưa chọn khung
     }
-  }, [selectNamHoc]);
+  }, [selectNamHoc, selectBomon]); // Dependency on selectNamHoc and selectBomon
 
   useEffect(() => {
     if (
@@ -59,11 +80,11 @@ const IndexPhanCongGiangVien = () => {
     }
   }, [isOpenXemGiangVienChonKhung]);
 
-  const fetchListGiangVienChuaChonKhung = async (selectNamHoc) => {
+  const fetchListGiangVienChuaChonKhung = async (selectNamHoc, selectBomon) => {
     try {
       const response = await CookiesAxios.post(
-        `${process.env.REACT_APP_URL_SERVER}/api/v1/truongbomon/giangvien/xem/phancong/chuachonkhung`,
-        { TENNAMHOC: selectNamHoc }
+        `${process.env.REACT_APP_URL_SERVER}/api/v1/truongkhoa/danhsachgiangvienchuadangkychonkhung`,
+        { TENNAMHOC: selectNamHoc, TENBOMON: selectBomon }
       );
       console.log("chua chon khung =>", response.data);
       if (response.data.EC === 1) {
@@ -73,11 +94,11 @@ const IndexPhanCongGiangVien = () => {
       console.error("Error fetching BoMon data:", error);
     }
   };
-  const fetchGiangVienList = async (selectNamHoc) => {
+  const fetchGiangVienList = async (selectNamHoc, selectBomon) => {
     try {
       const response = await CookiesAxios.post(
-        `${process.env.REACT_APP_URL_SERVER}/api/v1/truongbomon/giangvien/xem/phancong/dachonkhung/chitiet`,
-        { TENNAMHOC: selectNamHoc }
+        `${process.env.REACT_APP_URL_SERVER}/api/v1/truongkhoa/danhsachgiangviendadangkychonkhung`,
+        { TENNAMHOC: selectNamHoc, TENBOMON: selectBomon }
       );
       console.log("check setData_ListGVDaChonKhung", response.data);
       if (response.data.EC === 1) {
@@ -90,35 +111,66 @@ const IndexPhanCongGiangVien = () => {
 
   return (
     <>
-      <Box sx={{ maxWidth: { md: 220, xs: "100%" } }}>
-        <FormControl fullWidth className="profile-email-input">
-          <InputLabel id="select-label-trang-thai" shrink={!!selectNamHoc}>
-            Năm học
-          </InputLabel>
-          <Select
-            labelId="select-label-trang-thai"
-            id="trang-thai-select"
-            name="TENCHUCDANH"
-            label="Chức danh"
-            value={selectNamHoc}
-            defaultValue={selectNamHoc}
-            disabled={isDisableNamHoc}
-            onChange={(e) => setSelectNamHoc(e.target.value)}
-            variant="outlined"
-          >
-            {ListNamHoc && ListNamHoc.length > 0 ? (
-              ListNamHoc.map((namhoc, index) => (
-                <MenuItem key={index} value={namhoc.TENNAMHOC}>
-                  {namhoc.TENNAMHOC}
-                </MenuItem>
-              ))
-            ) : (
-              <MenuItem value="" disabled>
-                Không có năm học nào
-              </MenuItem>
-            )}
-          </Select>
-        </FormControl>
+      <Box sx={{ maxWidth: { md: 600, xs: "100%" } }}>
+        <Grid container spacing={2}>
+          <Grid item xs={6}>
+            <FormControl fullWidth className="profile-email-input">
+              <InputLabel id="select-label-trang-thai" shrink={!!selectNamHoc}>
+                Năm học
+              </InputLabel>
+              <Select
+                labelId="select-label-trang-thai"
+                id="trang-thai-select"
+                name="TENCHUCDANH"
+                label="Năm học"
+                value={selectNamHoc}
+                onChange={(e) => setSelectNamHoc(e.target.value)}
+                variant="outlined"
+                disabled={isDisableNamHoc}
+              >
+                {ListNamHoc && ListNamHoc.length > 0 ? (
+                  ListNamHoc.map((namhoc, index) => (
+                    <MenuItem key={index} value={namhoc.TENNAMHOC}>
+                      {namhoc.TENNAMHOC}
+                    </MenuItem>
+                  ))
+                ) : (
+                  <MenuItem value="" disabled>
+                    Không có năm học nào
+                  </MenuItem>
+                )}
+              </Select>
+            </FormControl>
+          </Grid>
+
+          <Grid item xs={6}>
+            <FormControl fullWidth className="profile-email-input">
+              <InputLabel id="select-label-bomon" shrink={!!selectBomon}>
+                Bộ môn
+              </InputLabel>
+              <Select
+                labelId="select-label-bomon"
+                id="bomon-select"
+                value={selectBomon}
+                onChange={(e) => setSelectBomon(e.target.value)}
+                variant="outlined"
+                disabled={isDisableNamHoc || !selectNamHoc} // Disabled if no NamHoc selected
+              >
+                {ListBomon && ListBomon.length > 0 ? (
+                  ListBomon.map((bomon, index) => (
+                    <MenuItem key={index} value={bomon.TENBOMON}>
+                      {bomon.TENBOMON}
+                    </MenuItem>
+                  ))
+                ) : (
+                  <MenuItem value="" disabled>
+                    Không có bộ môn nào
+                  </MenuItem>
+                )}
+              </Select>
+            </FormControl>
+          </Grid>
+        </Grid>
       </Box>
       <Box sx={{ display: "flex", gap: 2, mb: 2, mt: 2 }}>
         <Button
@@ -155,13 +207,15 @@ const IndexPhanCongGiangVien = () => {
         <Box sx={{ width: "100%", maxWidth: "1200px" }}>
           {isOpenXemGiangVienChonKhung ? (
             <GVTableDaChonKhung
-              data={data_ListGVDaChonKhung}
+              data={data_ListGVDaChonKhung || []}
               selectNamHoc={selectNamHoc}
+              selectBomon={selectBomon}
             />
           ) : (
             <GVTableChuaChonKhung
-              data={data_ListGVChuaChonKhung}
+              data={data_ListGVChuaChonKhung || []}
               selectNamHoc={selectNamHoc}
+              selectBomon={selectBomon}
             />
           )}
         </Box>

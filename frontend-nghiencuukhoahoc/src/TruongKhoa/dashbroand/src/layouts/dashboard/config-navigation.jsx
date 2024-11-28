@@ -25,7 +25,16 @@ const navConfig = [
     path: "/dang-ky-khung-gio-chuan",
     icon: icon("ic_user"),
   },
-
+  {
+    title: "danh sách giảng viên đăng ký",
+    path: "/dang-ky-nghien-cuu",
+    icon: icon("ic_user"),
+  },
+  {
+    title: "danh sách đăng ký NCKH",
+    path: "/dang-ky-nghien-cuu-khoa-hoc",
+    icon: icon("ic_user"),
+  },
   {
     title: "Thông tin cá nhân",
     path: "/tai-khoan-giangvien/thong-tin",

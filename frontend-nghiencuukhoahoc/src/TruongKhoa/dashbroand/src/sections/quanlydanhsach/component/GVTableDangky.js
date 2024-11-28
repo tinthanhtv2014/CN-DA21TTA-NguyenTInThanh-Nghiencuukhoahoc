@@ -18,13 +18,14 @@ import {
 import axios from "axios"; // Giả sử bạn sử dụng axios để gọi API
 import CookiesAxios from "../../CookiesAxios";
 
-const GVTableDaChonKhung = ({ data, selectNamHoc }) => {
+const GVTableDangky = ({ data, selectNamHoc }) => {
   const [page, setPage] = useState(0);
   const [showAll, setShowAll] = useState(false);
   const [selectedGV, setSelectedGV] = useState(null); // Trạng thái để lưu giảng viên đã chọn
   const [details, setDetails] = useState(null); // Trạng thái để lưu thông tin chi tiết của giảng viên
 
   useEffect(() => {
+    console.log("chèkjaldjsaldjkasda", data);
     if (selectNamHoc && selectedGV) {
       fetchDetails(selectedGV);
     }
@@ -46,14 +47,14 @@ const GVTableDaChonKhung = ({ data, selectNamHoc }) => {
   const fetchDetails = async (MAGV) => {
     try {
       const response = await CookiesAxios.post(
-        `${process.env.REACT_APP_URL_SERVER}/api/v1/truongbomon/giangvien/xem/phancong/dachonkhung/chitiet`,
+        `${process.env.REACT_APP_URL_SERVER}/api/v1/truongbomon/giangvien/danhsachgiangviendangkynkhk`,
         {
-          MAGV,
           TENNAMHOC: selectNamHoc,
         }
       );
-      if (response.data.EC === 1) {
-        setDetails(response.data.DT[0]);
+      console.log(response);
+      if (response.data.EC === 200) {
+        setDetails(response.data.DT);
       }
     } catch (error) {
       console.error("Failed to fetch details", error);
@@ -80,7 +81,8 @@ const GVTableDaChonKhung = ({ data, selectNamHoc }) => {
             <TableCell>Tên Giảng Viên</TableCell>
             {(!isMobile || showAll) && <TableCell>Email</TableCell>}
             {(!isMobile || showAll) && <TableCell>Điện Thoại</TableCell>}
-            {(!isMobile || showAll) && <TableCell>Địa Chỉ</TableCell>}
+            {(!isMobile || showAll) && <TableCell>Số lượng đề tài</TableCell>}
+            {/* {(!isMobile || showAll) && <TableCell>Tên đề tài</TableCell>} */}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -103,7 +105,9 @@ const GVTableDaChonKhung = ({ data, selectNamHoc }) => {
                 {(!isMobile || showAll) && (
                   <TableCell>{row.DIENTHOAI}</TableCell>
                 )}
-                {(!isMobile || showAll) && <TableCell>{row.DIACHI}</TableCell>}
+                {(!isMobile || showAll) && (
+                  <TableCell>{row.SoLuongDeTai}</TableCell>
+                )}
               </TableRow>
 
               <TableRow>
@@ -117,77 +121,32 @@ const GVTableDaChonKhung = ({ data, selectNamHoc }) => {
                     unmountOnExit
                   >
                     <Box margin={1}>
-                      {details ? (
-                        <>
-                          <Table size="small" aria-label="details">
-                            <TableBody>
-                              <TableRow>
-                                <TableCell sx={{ color: "red" }}>
-                                  Khung Chuẩn:
-                                </TableCell>
-                                <TableCell sx={{ color: "red" }}>
-                                  {details.TENKHUNGCHUAN}
-                                </TableCell>
-                              </TableRow>
-                              <TableRow>
-                                <TableCell>Giờ Giảng Dạy Hành Chính:</TableCell>
-                                <TableCell>
-                                  {details.GIOGIANGDAY_HANHCHINH}
-                                </TableCell>
-                              </TableRow>
-                              <TableRow>
-                                <TableCell sx={{ color: "red" }}>
-                                  Giờ Giảng Dạy Chuẩn:
-                                </TableCell>
-                                <TableCell sx={{ color: "red" }}>
-                                  {details.GIOGIANGDAY_CHUAN}
-                                </TableCell>
-                              </TableRow>
-                              <TableRow>
-                                <TableCell>
-                                  Giờ Nghiên Cứu Khoa Học Hành Chính:
-                                </TableCell>
-                                <TableCell>
-                                  {details.GIONGHIENCUUKHOAHOC_HANHCHINH}
-                                </TableCell>
-                              </TableRow>
-                              <TableRow>
-                                <TableCell sx={{ color: "red" }}>
-                                  Giờ Nghiên Cứu Khoa Học Chuẩn:
-                                </TableCell>
-                                <TableCell sx={{ color: "red" }}>
-                                  {details.GIONGHIENCUUKHOAHOC_CHUAN}
-                                </TableCell>
-                              </TableRow>
-                              <TableRow>
-                                <TableCell>
-                                  Giờ Phục Vụ Cộng Đồng Hành Chính:
-                                </TableCell>
-                                <TableCell>
-                                  {details.GIOPHUCVUCONGDONG_HANHCHINH}
-                                </TableCell>
-                              </TableRow>
-                              <TableRow>
-                                <TableCell sx={{ color: "red" }}>
-                                  Giờ Phục Vụ Cộng Đồng Chuẩn:
-                                </TableCell>
-                                <TableCell sx={{ color: "red" }}>
-                                  {details.GIOPHUCVUCONGDONG_CHUAN}
-                                </TableCell>
-                              </TableRow>
-                              <TableRow>
-                                <TableCell>Ghi Chú:</TableCell>
-                                <TableCell>
-                                  {details.GHICHU || "Không có"}
-                                </TableCell>
-                              </TableRow>
-                            </TableBody>
-                          </Table>
-                        </>
+                      {details &&
+                      details.filter((detail) => detail.MAGV === row.MAGV)
+                        .length > 0 ? (
+                        details
+                          .filter((detail) => detail.MAGV === row.MAGV)
+                          .map((detail, index) => (
+                            <Table
+                              size="small"
+                              aria-label="details"
+                              key={index}
+                            >
+                              <TableBody>
+                                <TableRow>
+                                  <TableCell sx={{ color: "red" }}>
+                                    Đề tài đăng ký:
+                                  </TableCell>
+                                  <TableCell sx={{ color: "red" }}>
+                                    {detail.DanhSachDeTai}
+                                  </TableCell>
+                                </TableRow>
+                              </TableBody>
+                            </Table>
+                          ))
                       ) : (
                         <Typography sx={{ color: "red" }}>
-                          {" "}
-                          Giảng viên không có khung chuẩn
+                          Giảng viên không có đề tài đăng ký
                         </Typography>
                       )}
                     </Box>
@@ -230,4 +189,4 @@ const GVTableDaChonKhung = ({ data, selectNamHoc }) => {
   );
 };
 
-export default GVTableDaChonKhung;
+export default GVTableDangky;

@@ -50,9 +50,9 @@ const CRUDgiangvien_CNTT = (app) => {
   //   router.delete("/xoa", deleteNAMHOC);
 
   //route bên phân công
-  router.get(
+  router.post(
     "/xem/phancong/chuachonkhung",
-    checkUserJWT,
+
     get_giangvien_CNTT_chuachonkhung
   );
   router.get(
