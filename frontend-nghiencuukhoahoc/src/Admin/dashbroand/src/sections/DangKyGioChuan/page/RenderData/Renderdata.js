@@ -47,7 +47,7 @@ const RenderData = ({
   const [TimeDangKyKhungGioChuan, setTimeDangKyKhungGioChuan] = useState("");
   const [StartTime, setStartTime] = useState("");
   const [EndTime, setEndTime] = useState("");
-
+  const [isRegistered, setIsRegistered] = useState(false);
   const navigate = useNavigate();
   useEffect(() => {
     if (dataKhungChuan) {
@@ -104,6 +104,11 @@ const RenderData = ({
             );
             console.log("response.data.DT", response.data.DT);
             setDataRenderKhungChuan(response.data.DT);
+            if (response.data.DT && response.data.DT.length > 0) {
+              setIsRegistered(true); // Bật nút nếu có dữ liệu
+            } else {
+              setIsRegistered(false); // Tắt nút nếu không có dữ liệu
+            }
           }
         } else if (isOpenOption === "Chọn Khung Giờ") {
           setDataRenderKhungChuan(dataKhungChuan);
@@ -145,8 +150,10 @@ const RenderData = ({
     );
     if (response.data.EC === 1) {
       toast.success(response.data.EM);
+      setIsRegistered(true);
     } else {
-      // toast.error(response.data.EM);
+      toast.error(response.data.EM);
+      setIsRegistered(false);
     }
   };
   const handleOpenModal = () => setIsModalOpen(true);
@@ -188,6 +195,7 @@ const RenderData = ({
                   <Button
                     variant="contained"
                     onClick={handleMoveRegisterDanhMuc}
+                    disabled={!isRegistered}
                   >
                     Thực Hiện Đăng Ký Khoa Học
                   </Button>

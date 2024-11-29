@@ -48,6 +48,7 @@ const RenderData = ({
   const [TimeDangKyKhungGioChuan, setTimeDangKyKhungGioChuan] = useState("");
   const [StartTime, setStartTime] = useState("");
   const [EndTime, setEndTime] = useState("");
+  const [isRegistered, setIsRegistered] = useState(false);
   const navigate = useNavigate();
   useEffect(() => {
     if (dataKhungChuan) {
@@ -102,6 +103,12 @@ const RenderData = ({
           console.log("response.data.DT22222", MaGV);
           console.log("response.data.DT", response);
           setDataRenderKhungChuan(response.data.DT);
+
+          if (response.data.DT && response.data.DT.length > 0) {
+            setIsRegistered(true); // Bật nút nếu có dữ liệu
+          } else {
+            setIsRegistered(false); // Tắt nút nếu không có dữ liệu
+          }
         } else if (isOpenOption === "Chọn Khung Giờ") {
           setDataRenderKhungChuan(dataKhungChuan);
           setIsDisableNamHoc(true);
@@ -144,12 +151,18 @@ const RenderData = ({
     );
     if (response.data.EC === 1) {
       toast.success(response.data.EM);
+      setIsRegistered(true);
     } else {
+      setIsRegistered(false);
       toast.error(response.data.EM);
     }
   };
   const handleMoveRegisterDanhMuc = () => {
-    navigate("/admin/dang-ky-danh-muc");
+    if (!SelectKhungGioChuan) {
+      toast.warn("Vui lòng chọn khung giờ chuẩn trước khi thực hiện đăng ký!");
+    } else {
+      navigate("/admin/dang-ky-danh-muc");
+    }
   };
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
@@ -201,6 +214,7 @@ const RenderData = ({
                   <Button
                     variant="contained"
                     onClick={handleMoveRegisterDanhMuc}
+                    disabled={!isRegistered}
                   >
                     Thực Hiện Đăng Ký Khoa Học
                   </Button>
