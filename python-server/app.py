@@ -4,7 +4,10 @@ import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
 import traceback
-
+import plotly.express as px
+import plotly.io as pio
+import numpy as np
+import json
 app = Flask(__name__)
 CORS(app)  # Kích hoạt CORS cho tất cả các route
 
@@ -108,6 +111,57 @@ def random_forest_predict():
             "EM": "Lỗi xử lý Random Forest",
             "EC": -1,
             "DT": []
+        }), 500
+
+
+
+
+@app.route('/api/helloworld', methods=['GET'])
+def hello_world():
+    return jsonify(message="Hello World!")
+
+
+
+
+@app.route('/api/plotly', methods=['GET'])
+def plotly_chart():
+    try:
+        # Lấy dữ liệu Canada từ bộ dữ liệu gapminder
+        data_canada = px.data.gapminder().query("country == 'Canada'")
+
+        # Tạo biểu đồ cột với năm trên trục x và dân số trên trục y
+        fig = px.bar(data_canada, x='year', y='pop')
+
+        # Chuyển đổi biểu đồ thành một dict
+        chart_data = fig.to_dict()
+
+        # Hàm đệ quy để chuyển ndarray thành list
+        def convert_ndarray(obj):
+            if isinstance(obj, np.ndarray):
+                return obj.tolist()
+            elif isinstance(obj, dict):
+                return {key: convert_ndarray(value) for key, value in obj.items()}
+            elif isinstance(obj, list):
+                return [convert_ndarray(item) for item in obj]
+            else:
+                return obj
+
+        # Chuyển đổi chart_data
+        chart_data_serializable = convert_ndarray(chart_data)
+
+        # Trả về biểu đồ dưới dạng JSON
+        return jsonify({
+            "EM": "Success",
+            "EC": 0,
+            "DT": chart_data_serializable
+        })
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({
+            "EM": "Lỗi xử lý biểu đồ",
+            "EC": -1,
+            "DT": str(e)
         }), 500
 
 # Chạy server

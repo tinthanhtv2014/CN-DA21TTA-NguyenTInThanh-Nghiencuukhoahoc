@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const pool = require("../../config/database");
 const router = express.Router();
-
+const axios = require("axios");
 const {
   GiangVien_thuoc_KhoaController,
   timkiem_email_taikhoanController,
@@ -236,11 +236,11 @@ GROUP BY
   });
 
   router.post("/danhsachgiangvienchuadangkynkhktheobomon", async (req, res) => {
-    // try {
-    const TENNAMHOC = req.body.TENNAMHOC;
-    const TENBOMON = req.body.TENBOMON;
-    let [results_ctdt_bomon, fields1] = await pool.execute(
-      `SELECT 
+    try {
+      const TENNAMHOC = req.body.TENNAMHOC;
+      const TENBOMON = req.body.TENBOMON;
+      let [results_ctdt_bomon, fields1] = await pool.execute(
+        `SELECT 
     giangvien.*
 FROM 
     giangvien
@@ -255,17 +255,17 @@ WHERE
     AND bomon.TENBOMON = ?;
 
 `,
-      [TENNAMHOC, TENBOMON]
-    );
-    return res.status(200).json({
-      EM: " mã lớp hoặc chương trình bị rỗng",
-      EC: 200,
-      DT: results_ctdt_bomon,
-    });
-    // } catch (err) {
-    //   console.error("Error fetching hotels:", err.message);
-    //   res.status(500).json({ message: err.message });
-    // }
+        [TENNAMHOC, TENBOMON]
+      );
+      return res.status(200).json({
+        EM: " mã lớp hoặc chương trình bị rỗng",
+        EC: 200,
+        DT: results_ctdt_bomon,
+      });
+    } catch (err) {
+      console.error("Error fetching hotels:", err.message);
+      res.status(500).json({ message: err.message });
+    }
   });
 
   return app.use("/api/v1/truongkhoa", router);

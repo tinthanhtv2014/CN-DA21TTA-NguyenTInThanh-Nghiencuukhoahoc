@@ -11,10 +11,14 @@ import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import { Line } from "react-chartjs-2";
 import "chart.js/auto"; // Để tránh lỗi khi dùng Chart.js 3+
+import Plot from "react-plotly.js";
+import axios from "axios";
+
 const AdminCreate = () => {
   const navigate = useNavigate();
   const token = Cookies.get("accessToken");
   const [TenDangNhap, setTenDangNhap] = useState(null);
+  const [chartData, setChartData] = useState(null);
   useEffect(() => {
     if (token) {
       const decodedToken = jwtDecode(token);
@@ -57,6 +61,25 @@ const AdminCreate = () => {
       },
     ],
   };
+  useEffect(() => {
+    // Gọi API từ server Python để lấy dữ liệu biểu đồ
+    fetch("http://localhost:5000/api/plotly")
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.EM === "Success") {
+          // Giả sử data.DT là đối tượng JSON với dữ liệu biểu đồ
+          try {
+            console.log(data.DT); // Kiểm tra dữ liệu nhận được
+            setChartData(data.DT);
+          } catch (e) {
+            console.error("Error parsing chart data:", e);
+          }
+        } else {
+          console.error("Error fetching chart:", data.EM);
+        }
+      })
+      .catch((error) => console.error("Error fetching chart data:", error));
+  }, []);
   return (
     // <>
     //   <Container className="mt-4">
@@ -173,9 +196,19 @@ const AdminCreate = () => {
     // </>
     <>
       {" "}
-      <div style={{ width: "80%", margin: "auto" }}>
+      {/* <div style={{ width: "80%", margin: "auto" }}>
         <h3>Biểu đồ đường theo lớp</h3>
         <Line data={data} />
+      </div> */}
+      <div>
+        {chartData ? (
+          <Plot
+            data={chartData.data} // Dữ liệu đồ thị, truyền từ API
+            layout={chartData.layout} // Bố cục của đồ thị, truyền từ API
+          />
+        ) : (
+          <p>Loading chart...</p>
+        )}
       </div>
     </>
   );
