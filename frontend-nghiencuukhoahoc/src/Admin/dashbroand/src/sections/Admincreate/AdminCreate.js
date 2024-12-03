@@ -19,6 +19,7 @@ const AdminCreate = () => {
   const token = Cookies.get("accessToken");
   const [TenDangNhap, setTenDangNhap] = useState(null);
   const [chartData, setChartData] = useState(null);
+  const [chartData2, setChartData2] = useState(null);
   useEffect(() => {
     if (token) {
       const decodedToken = jwtDecode(token);
@@ -80,6 +81,27 @@ const AdminCreate = () => {
       })
       .catch((error) => console.error("Error fetching chart data:", error));
   }, []);
+
+  useEffect(() => {
+    // Gọi API từ server Python để lấy dữ liệu biểu đồ
+    fetch("http://localhost:5000/api/chart")
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.EM === "Success") {
+          // Giả sử data.DT là đối tượng JSON với dữ liệu biểu đồ
+          try {
+            console.log(data.DT); // Kiểm tra dữ liệu nhận được
+            setChartData2(data.DT);
+          } catch (e) {
+            console.error("Error parsing chart data:", e);
+          }
+        } else {
+          console.error("Error fetching chart:", data.EM);
+        }
+      })
+      .catch((error) => console.error("Error fetching chart data:", error));
+  }, []);
+
   return (
     // <>
     //   <Container className="mt-4">
@@ -205,6 +227,16 @@ const AdminCreate = () => {
           <Plot
             data={chartData.data} // Dữ liệu đồ thị, truyền từ API
             layout={chartData.layout} // Bố cục của đồ thị, truyền từ API
+          />
+        ) : (
+          <p>Loading chart...</p>
+        )}
+      </div>
+      <div>
+        {chartData2 ? (
+          <Plot
+            data={chartData2.data} // Dữ liệu đồ thị, truyền từ API
+            layout={chartData2.layout} // Bố cục của đồ thị, truyền từ API
           />
         ) : (
           <p>Loading chart...</p>
