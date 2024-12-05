@@ -9,8 +9,26 @@ import plotly.io as pio
 import numpy as np
 import json
 import plotly.graph_objects as go
+import pymysql
 app = Flask(__name__)
 CORS(app)  # Kích hoạt CORS cho tất cả các route
+
+
+db_config = {
+    'host': 'localhost',      # Địa chỉ máy chủ MySQL
+    'user': 'root',           # Tên người dùng
+    'database': 'nghiencuukhoahoc', # Tên cơ sở dữ liệu
+    'charset': 'utf8mb4'
+}
+
+def get_db_connection():
+    connection = pymysql.connect(
+        host=db_config['host'],
+        user=db_config['user'],
+        database=db_config['database'],
+        charset=db_config['charset']
+    )
+    return connection
 
 # Định nghĩa một route đơn giản
 @app.route('/', methods=['GET'])
@@ -230,6 +248,40 @@ def chart():
             "EC": -1,
             "DT": str(e)
         }), 500
+
+
+
+
+
+@app.route('/api/database', methods=['GET'])
+def fetch_data():
+    try:
+        # Kết nối đến cơ sở dữ liệu
+        connection = get_db_connection()
+        cursor = connection.cursor(pymysql.cursors.DictCursor)
+
+        # Truy vấn cơ sở dữ liệu
+        cursor.execute("SELECT * FROM giangvien")
+        result = cursor.fetchall()
+
+        # Đóng kết nối
+        cursor.close()
+        connection.close()
+
+        return jsonify({
+            "EM": "Success",
+            "EC": 0,
+            "DT": result
+        })
+    except Exception as e:
+        return jsonify({
+            "EM": "Lỗi kết nối cơ sở dữ liệu",
+            "EC": -1,
+            "DT": str(e)
+        }), 500
+
+
+
 
 
 # Chạy server
