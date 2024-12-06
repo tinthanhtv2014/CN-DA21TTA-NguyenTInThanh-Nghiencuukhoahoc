@@ -5,18 +5,20 @@ import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import CookiesAxios from "../CookiesAxios";
+
 const AccountGV = () => {
   const [giangVien, setGiangVien] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [TenDangNhapGV, setTenDangNhapGV] = useState(null);
-
+  const [data_user, setData_user] = useState(null);
   useEffect(() => {
     const auth = Cookies.get("accessToken");
     const decodeAuth = jwtDecode(auth);
     console.log(decodeAuth);
     setTenDangNhapGV(decodeAuth.taikhoan);
     fetchDataGV(decodeAuth.taikhoan);
+    setData_user(decodeAuth);
   }, []);
   const CallbackAPiProfileGV = () => {
     fetchDataGV(TenDangNhapGV);
@@ -49,11 +51,16 @@ const AccountGV = () => {
 
   return (
     <>
-      {giangVien && (
-        <GiangVienProfile
-          CallbackAPiProfileGV={CallbackAPiProfileGV}
-          giangVien={giangVien}
-        />
+      {giangVien ? (
+        <>
+          {" "}
+          <GiangVienProfile
+            CallbackAPiProfileGV={CallbackAPiProfileGV}
+            giangVien={giangVien}
+          />
+        </>
+      ) : (
+        <div>Loading...</div>
       )}
     </>
   );

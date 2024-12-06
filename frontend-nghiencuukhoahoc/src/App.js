@@ -5,7 +5,7 @@ import { ToastContainer } from "react-toastify";
 import { AuthProvider } from "./Authentication/AuthContext";
 import "react-toastify/dist/ReactToastify.css";
 import LoginAdmin from "../src/Admin/dashbroand/src/pages/login.jsx";
-
+import OtpComponent from "../src/Admin/dashbroand/src/sections/login/sendOTP.jsx";
 import PrivateRoute from "./Authentication/PrivateRoute.js";
 function App() {
   return (
@@ -19,6 +19,7 @@ function App() {
           <Route path="/truong-bm/*" element={<PrivateRoute />} />
           <Route path="/truongkhoa/*" element={<PrivateRoute />} />
           <Route path="/giang-vien-ngoai-truong/*" element={<PrivateRoute />} />
+          <Route path="/login/forgot-password" element={<OtpComponent />} />
         </Routes>
         <ToastContainer
           position="top-right"

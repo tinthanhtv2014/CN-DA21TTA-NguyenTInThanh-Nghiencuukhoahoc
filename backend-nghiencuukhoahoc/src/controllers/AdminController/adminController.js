@@ -139,16 +139,10 @@ const updateTaiKhoanController = async (req, res) => {
   try {
     const tendangnhap = req.params.tenDangNhap;
     const matkhaucu = req.body.matKhaucu;
-    const phanQuyen = req.body.phanQuyen;
     const matkhaumoi = req.body.matKhaumoi;
     // console.log(req.body);
     // console.log(req.params.tenDangNhap);
-    let results = await updateTaiKhoan(
-      tendangnhap,
-      matkhaucu,
-      matkhaumoi,
-      phanQuyen
-    );
+    let results = await updateTaiKhoan(tendangnhap, matkhaucu, matkhaumoi);
     return res.status(200).json({
       EM: results.EM,
       EC: results.EC,

@@ -56,6 +56,12 @@ const navConfig = [
     path: "/tai-khoan-giangvien/thong-tin",
     icon: icon("ic_blog"),
   },
+
+  {
+    title: "Đổi mật khẩu",
+    path: "/tai-khoan-giangvien/doi-mat-khau",
+    icon: icon("ic_blog"),
+  },
 ];
 
 export default navConfig;

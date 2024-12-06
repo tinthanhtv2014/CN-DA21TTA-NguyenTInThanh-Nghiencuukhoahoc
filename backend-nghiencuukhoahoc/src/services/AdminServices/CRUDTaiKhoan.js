@@ -472,19 +472,26 @@ const LoginTaikhoanwithGOOGLE = async (tenDangnhap) => {
   }
 };
 
-const updateTaiKhoan = async (
-  tenDangnhap,
-  matKhaucu,
-  matkhaumoi,
-  phanQuyen,
-  trangThai
-) => {
+const updateTaiKhoan = async (tenDangnhap, matKhaucu, matkhaumoi) => {
   try {
     let [results1, fields1] = await pool.execute(
       "select * from taikhoan where TENDANGNHAP = ?",
       [tenDangnhap]
     );
     if (results1.length > 0) {
+      console.log(results1[0]);
+      if (results1[0].MATKHAU === null) {
+        let hashpass1 = await hashPassword(matkhaumoi);
+        await pool.execute(
+          "UPDATE taikhoan SET MATKHAU = ? WHERE TENDANGNHAP = ?",
+          [hashpass1, tenDangnhap]
+        );
+        return {
+          EM: "update thành công",
+          EC: 1,
+          DT: [],
+        };
+      }
       const isCorrectPass = await bcrypt.compare(
         matKhaucu,
         results1[0].MATKHAU
@@ -492,12 +499,12 @@ const updateTaiKhoan = async (
       if (isCorrectPass) {
         let hashpass = await hashPassword(matkhaumoi);
         let [results, fields] = await pool.execute(
-          `UPDATE taikhoan SET MATKHAU = ?, PHANQUYEN = ?, TRANGTHAI = ? WHERE TENDANGNHAP = ?`,
-          [hashpass, phanQuyen, trangThai, tenDangnhap]
+          `UPDATE taikhoan SET MATKHAU = ? WHERE TENDANGNHAP = ?`,
+          [hashpass, tenDangnhap]
         );
         return {
           EM: "update thành công",
-          EC: 0,
+          EC: 1,
           DT: [],
         };
       }

@@ -11,7 +11,9 @@ const DangKyGioChuan = lazy(() =>
   import("../sections/DangKyGioChuan/IndexDangKyGioChuan")
 );
 const FileExcel = lazy(() => import("../sections/FileExcel/FileExcel"));
-
+const AccountGVChangePass = lazy(() =>
+  import("../sections/Account/AccountGV-ChangePass")
+);
 const IndexPage = lazy(() => import("../pages/app"));
 const BlogPage = lazy(() => import("../pages/blog"));
 const UserPage = lazy(() => import("../pages/user"));
@@ -134,6 +136,27 @@ export default function Router() {
         </DashboardLayout>
       ),
     },
+
+    {
+      path: "/tai-khoan-giangvien/doi-mat-khau", // Thêm ký tự '*' vào cuối đường dẫn
+      element: (
+        <DashboardLayout>
+          <Suspense
+            fallback={
+              <Skeleton
+                variant="rectangular"
+                width="100%"
+                height="100%"
+                sx={{ bgcolor: "grey.300" }}
+              />
+            }
+          >
+            <AccountGVChangePass />
+          </Suspense>
+        </DashboardLayout>
+      ),
+    },
+
     {
       path: "/login",
       element: <LoginPage />,

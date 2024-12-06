@@ -95,6 +95,10 @@ export default function LoginView() {
     }
   };
 
+  const handleOTP = () => {
+    navigate("./forgot-password");
+  };
+
   const renderForm = (
     <>
       <Stack spacing={3}>
@@ -134,7 +138,14 @@ export default function LoginView() {
         justifyContent="flex-end"
         sx={{ my: 3 }}
       >
-        <Link className="text-login" variant="subtitle2" underline="hover">
+        <Link
+          className="text-login"
+          variant="subtitle2"
+          underline="hover"
+          onClick={() => {
+            handleOTP();
+          }}
+        >
           Forgot password?
         </Link>
       </Stack>
