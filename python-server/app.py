@@ -145,13 +145,33 @@ def hello_world():
 @app.route('/api/plotly', methods=['GET'])
 def plotly_chart():
     try:
-        # Lấy dữ liệu Canada từ bộ dữ liệu gapminder
-        data_canada = px.data.gapminder().query("country == 'Canada'")
+        # Kết nối đến cơ sở dữ liệu
+        connection = get_db_connection()
+        cursor = connection.cursor(pymysql.cursors.DictCursor)
 
-        # Tạo biểu đồ cột với năm trên trục x và dân số trên trục y
-        fig = px.bar(data_canada, x='year', y='pop')
+        # Truy vấn cơ sở dữ liệu
+        cursor.execute("""
+            SELECT bomon.TENBOMON, COUNT(dang_ky_thuc_hien_quy_doi.MAGV) AS SoLuongDeTai
+            FROM bomon
+            INNER JOIN giangvien ON bomon.MABOMON = giangvien.MABOMON
+            INNER JOIN khoa ON khoa.MAKHOA = bomon.MAKHOA
+            INNER JOIN dang_ky_thuc_hien_quy_doi ON giangvien.MAGV = dang_ky_thuc_hien_quy_doi.MAGV
+            WHERE khoa.TENKHOA = N'Khoa Kỹ Thuật Công Nghệ'
+            GROUP BY bomon.TENBOMON;
+        """)
+        result = cursor.fetchall()
 
-        # Chuyển đổi biểu đồ thành một dict
+        # Đóng kết nối
+        cursor.close()
+        connection.close()
+
+        # Chuyển kết quả thành DataFrame
+        df = pd.DataFrame(result)
+
+        # Tạo biểu đồ cột sử dụng Plotly
+        fig = px.bar(df, x='TENBOMON', y='SoLuongDeTai', labels={'TENBOMON': 'Bộ Môn', 'SoLuongDeTai': 'Số Lượng Đề Tài'})
+
+        # Chuyển đổi biểu đồ thành dict
         chart_data = fig.to_dict()
 
         # Hàm đệ quy để chuyển ndarray thành list
@@ -182,9 +202,6 @@ def plotly_chart():
             "EC": -1,
             "DT": str(e)
         }), 500
-
-
-
 
 
 @app.route('/api/chart', methods=['GET'])
@@ -252,34 +269,46 @@ def chart():
 
 
 
-
-@app.route('/api/database', methods=['GET'])
-def fetch_data():
+@app.route('/api/piechart', methods=['GET'])
+def pie_chart():
     try:
-        # Kết nối đến cơ sở dữ liệu
-        connection = get_db_connection()
-        cursor = connection.cursor(pymysql.cursors.DictCursor)
+        # Dữ liệu mẫu từ dataset tips của Plotly
+        df = px.data.tips()
+        
+        # Tạo biểu đồ hình tròn (pie chart)
+        fig = px.pie(df, values='tip', names='day')
+        
+        # Chuyển đổi biểu đồ thành một dict
+        chart_data = fig.to_dict()
 
-        # Truy vấn cơ sở dữ liệu
-        cursor.execute("SELECT * FROM giangvien")
-        result = cursor.fetchall()
+        # Hàm đệ quy để chuyển ndarray thành list
+        def convert_ndarray(obj):
+            if isinstance(obj, np.ndarray):
+                return obj.tolist()
+            elif isinstance(obj, dict):
+                return {key: convert_ndarray(value) for key, value in obj.items()}
+            elif isinstance(obj, list):
+                return [convert_ndarray(item) for item in obj]
+            else:
+                return obj
 
-        # Đóng kết nối
-        cursor.close()
-        connection.close()
+        # Chuyển đổi chart_data để có thể trả về dưới dạng JSON
+        chart_data_serializable = convert_ndarray(chart_data)
 
+        # Trả về biểu đồ dưới dạng JSON
         return jsonify({
             "EM": "Success",
             "EC": 0,
-            "DT": result
+            "DT": chart_data_serializable
         })
+
     except Exception as e:
+        print(f"Error: {e}")
         return jsonify({
-            "EM": "Lỗi kết nối cơ sở dữ liệu",
+            "EM": "Lỗi xử lý biểu đồ",
             "EC": -1,
             "DT": str(e)
         }), 500
-
 
 
 

@@ -20,6 +20,24 @@ const AdminCreate = () => {
   const [TenDangNhap, setTenDangNhap] = useState(null);
   const [chartData, setChartData] = useState(null);
   const [chartData2, setChartData2] = useState(null);
+  const [chartData3, setChartData3] = useState(null);
+  const cards = [
+    {
+      icon: "bi-graph-up",
+      title: "Bộ môn có số lượng nhiều nhất",
+      amount: "$1234",
+    },
+    {
+      icon: "bi-bar-chart",
+      title: "Tổng số lượng đề tài của khoa",
+      amount: "$1234",
+    },
+    {
+      icon: "bi-graph-down",
+      title: "Giảng viên đăng ký nhiều nhất",
+      amount: "$1234",
+    },
+  ];
   useEffect(() => {
     if (token) {
       const decodedToken = jwtDecode(token);
@@ -101,7 +119,40 @@ const AdminCreate = () => {
       })
       .catch((error) => console.error("Error fetching chart data:", error));
   }, []);
+  useEffect(() => {
+    // Gọi API từ server Python để lấy dữ liệu biểu đồ
+    fetch("http://localhost:5000/api/piechart")
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.EM === "Success") {
+          // Giả sử data.DT là đối tượng JSON với dữ liệu biểu đồ
+          try {
+            console.log(data.DT); // Kiểm tra dữ liệu nhận được
+            setChartData3(data.DT);
+          } catch (e) {
+            console.error("Error parsing chart data:", e);
+          }
+        } else {
+          console.error("Error fetching chart:", data.EM);
+        }
+      })
+      .catch((error) => console.error("Error fetching chart data:", error));
+  }, []);
+  const cardStyle = {
+    backgroundColor: "#191C24", // Màu nền tối
+    color: "white", // Màu chữ trắng
+    padding: "1rem",
+    display: "flex",
+    alignItems: "center",
+    height: "100%",
+    border: "none",
+  };
 
+  const iconStyle = {
+    fontSize: "2rem",
+    color: "red", // Màu của biểu tượng đỏ
+    marginRight: "1rem",
+  };
   return (
     // <>
     //   <Container className="mt-4">
@@ -222,6 +273,21 @@ const AdminCreate = () => {
         <h3>Biểu đồ đường theo lớp</h3>
         <Line data={data} />
       </div> */}
+      <div className="row g-4">
+        {cards.map((card, index) => (
+          <div className="col-md-3" key={index}>
+            <div className="card" style={{ ...cardStyle, padding: "1rem" }}>
+              <div className="d-flex align-items-center justify-content-between">
+                <i className={`card-icon ${card.icon}`} style={iconStyle}></i>
+                <div className="ms-3">
+                  <h5 className="mb-0">{card.title}</h5>
+                  <p className="mb-0">{card.amount}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
       <div>
         {chartData ? (
           <Plot
@@ -237,6 +303,16 @@ const AdminCreate = () => {
           <Plot
             data={chartData2.data} // Dữ liệu đồ thị, truyền từ API
             layout={chartData2.layout} // Bố cục của đồ thị, truyền từ API
+          />
+        ) : (
+          <p>Loading chart...</p>
+        )}
+      </div>
+      <div>
+        {chartData3 ? (
+          <Plot
+            data={chartData3.data} // Dữ liệu đồ thị, truyền từ API
+            layout={chartData3.layout} // Bố cục của đồ thị, truyền từ API
           />
         ) : (
           <p>Loading chart...</p>
