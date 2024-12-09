@@ -13,7 +13,7 @@ import { Line } from "react-chartjs-2";
 import "chart.js/auto"; // Để tránh lỗi khi dùng Chart.js 3+
 import Plot from "react-plotly.js";
 import axios from "axios";
-
+import { BiListUl, BiCodeAlt, BiBarChart } from "react-icons/bi";
 const AdminCreate = () => {
   const navigate = useNavigate();
   const token = Cookies.get("accessToken");
@@ -21,21 +21,56 @@ const AdminCreate = () => {
   const [chartData, setChartData] = useState(null);
   const [chartData2, setChartData2] = useState(null);
   const [chartData3, setChartData3] = useState(null);
+  const [nhieunhat, setNhieunhat] = useState([]);
+  const [soluong, setSoluong] = useState([]);
+  const [soluong2, setSoluong2] = useState([]);
+  const [tengiangvien, setTengiangvien] = useState([]);
+  const fetchBomonNhieuNhat = async () => {
+    const response = await axios.get(
+      `http://localhost:8081/api/v1/truongkhoa/bomondangkynhieunhat`
+    );
+
+    if (response.data.EC === 200) {
+      setNhieunhat(response.data.DT[0].TENBOMON);
+      setSoluong(response.data.DT[0].SoLuongDeTai);
+    }
+  };
+
+  const fetchSoluongNhieuNhat = async () => {
+    const response = await axios.get(
+      `http://localhost:8081/api/v1/truongkhoa/laytongsoluong`
+    );
+    console.log("checkaosdhaldhlahlkdhalkhdlkasd", response);
+    if (response.data.EC === 200) {
+      setSoluong2(response.data.DT[0].TongSoLuongDeTai);
+    }
+  };
+
+  const fetchGiangviennhieunhat = async () => {
+    const response = await axios.get(
+      `http://localhost:8081/api/v1/truongkhoa/laygiangviendangkynhieunhat`
+    );
+    console.log("checkaosdhaldhlahlkdhalkhdlkasd", response);
+    if (response.data.EC === 200) {
+      setTengiangvien(response.data.DT[0].TenGiangVien);
+    }
+  };
+
   const cards = [
     {
-      icon: "bi-graph-up",
+      icon: "bi bi-bar-chart",
       title: "Bộ môn có số lượng nhiều nhất",
-      amount: "$1234",
+      amount: nhieunhat + ` - ` + soluong + ` Đề tài `,
     },
     {
-      icon: "bi-bar-chart",
+      icon: "bi bi-list-ul",
       title: "Tổng số lượng đề tài của khoa",
-      amount: "$1234",
+      amount: soluong2,
     },
     {
-      icon: "bi-graph-down",
+      icon: "bi bi-code-alt",
       title: "Giảng viên đăng ký nhiều nhất",
-      amount: "$1234",
+      amount: tengiangvien,
     },
   ];
   useEffect(() => {
@@ -98,6 +133,9 @@ const AdminCreate = () => {
         }
       })
       .catch((error) => console.error("Error fetching chart data:", error));
+    fetchBomonNhieuNhat();
+    fetchSoluongNhieuNhat();
+    fetchGiangviennhieunhat();
   }, []);
 
   useEffect(() => {
@@ -139,20 +177,25 @@ const AdminCreate = () => {
       .catch((error) => console.error("Error fetching chart data:", error));
   }, []);
   const cardStyle = {
-    backgroundColor: "#191C24", // Màu nền tối
-    color: "white", // Màu chữ trắng
+    backgroundColor: "#f8f9fa", // Đồng bộ màu nền với biểu đồ
+    color: "black", // Điều chỉnh màu chữ để tương phản
     padding: "1rem",
     display: "flex",
     alignItems: "center",
     height: "100%",
-    border: "none",
+    borderRadius: "8px", // Tạo góc bo tròn
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Thêm viền nổi
+    border: "1px solid #dee2e6", // Đường viền sáng để nổi bật
   };
 
   const iconStyle = {
-    fontSize: "2rem",
-    color: "red", // Màu của biểu tượng đỏ
+    fontSize: "2rem", // Cái này vẫn giữ nguyên
+    color: "#000000", // Màu đen
     marginRight: "1rem",
+    width: "2rem", // Cung cấp chiều rộng
+    height: "2rem", // Cung cấp chiều cao
   };
+
   return (
     // <>
     //   <Container className="mt-4">
@@ -268,56 +311,146 @@ const AdminCreate = () => {
     //   </Container>
     // </>
     <>
-      {" "}
+      <div
+        className="row g-4"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {/* Cards Row */}
+        <div
+          className="row"
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            width: "100%",
+            marginBottom: "20px",
+          }}
+        >
+          {cards.map((card, index) => (
+            <div
+              className="col-md-3"
+              key={index}
+              style={{
+                margin: "0 10px", // Thêm khoảng cách ngang giữa các card
+                display: "flex",
+                justifyContent: "center",
+              }}
+            >
+              <div
+                className="card"
+                style={{
+                  ...cardStyle,
+                  padding: "1rem",
+                  width: "400px", // Đặt width cố định nếu cần
+                }}
+              >
+                <div className="d-flex align-items-center justify-content-between">
+                  <i className={`card-icon ${card.icon}`} style={iconStyle}></i>
+                  <div className="ms-3">
+                    <h5 className="mb-0">{card.title}</h5>
+                    <p className="mb-0">{card.amount}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Charts Row */}
+        <div
+          className="row"
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            width: "100%",
+          }}
+        >
+          <div className="col-5" style={{ marginBottom: "20px" }}>
+            <div
+              style={{
+                width: "100%",
+                height: "500px",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                backgroundColor: "#f8f9fa",
+                borderRadius: "8px",
+                padding: "10px",
+                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+              }}
+            >
+              {chartData ? (
+                <Plot
+                  data={chartData.data} // Dữ liệu đồ thị, truyền từ API
+                  layout={chartData.layout} // Bố cục của đồ thị, truyền từ API
+                  style={{ width: "100%", height: "100%" }}
+                />
+              ) : (
+                <p>Loading chart...</p>
+              )}
+            </div>
+          </div>
+          <div className="col-5" style={{ marginBottom: "20px" }}>
+            <div
+              style={{
+                width: "100%",
+                height: "500px",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                backgroundColor: "#f8f9fa",
+                borderRadius: "8px",
+                padding: "10px",
+                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+              }}
+            >
+              {chartData2 ? (
+                <Plot
+                  data={chartData2.data} // Dữ liệu đồ thị, truyền từ API
+                  layout={chartData2.layout} // Bố cục của đồ thị, truyền từ API
+                  style={{ width: "100%", height: "100%" }}
+                />
+              ) : (
+                <p>Loading chart...</p>
+              )}
+            </div>
+          </div>
+          <div className="col-5" style={{ marginBottom: "20px" }}>
+            <div
+              style={{
+                width: "100%",
+                height: "500px",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                backgroundColor: "#f8f9fa",
+                borderRadius: "8px",
+                padding: "10px",
+                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+              }}
+            >
+              {chartData3 ? (
+                <Plot
+                  data={chartData3.data} // Dữ liệu đồ thị, truyền từ API
+                  layout={chartData3.layout} // Bố cục của đồ thị, truyền từ API
+                  style={{ width: "100%", height: "100%" }}
+                />
+              ) : (
+                <p>Loading chart...</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* <div style={{ width: "80%", margin: "auto" }}>
         <h3>Biểu đồ đường theo lớp</h3>
         <Line data={data} />
       </div> */}
-      <div className="row g-4">
-        {cards.map((card, index) => (
-          <div className="col-md-3" key={index}>
-            <div className="card" style={{ ...cardStyle, padding: "1rem" }}>
-              <div className="d-flex align-items-center justify-content-between">
-                <i className={`card-icon ${card.icon}`} style={iconStyle}></i>
-                <div className="ms-3">
-                  <h5 className="mb-0">{card.title}</h5>
-                  <p className="mb-0">{card.amount}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-      <div>
-        {chartData ? (
-          <Plot
-            data={chartData.data} // Dữ liệu đồ thị, truyền từ API
-            layout={chartData.layout} // Bố cục của đồ thị, truyền từ API
-          />
-        ) : (
-          <p>Loading chart...</p>
-        )}
-      </div>
-      <div>
-        {chartData2 ? (
-          <Plot
-            data={chartData2.data} // Dữ liệu đồ thị, truyền từ API
-            layout={chartData2.layout} // Bố cục của đồ thị, truyền từ API
-          />
-        ) : (
-          <p>Loading chart...</p>
-        )}
-      </div>
-      <div>
-        {chartData3 ? (
-          <Plot
-            data={chartData3.data} // Dữ liệu đồ thị, truyền từ API
-            layout={chartData3.layout} // Bố cục của đồ thị, truyền từ API
-          />
-        ) : (
-          <p>Loading chart...</p>
-        )}
-      </div>
     </>
   );
 };

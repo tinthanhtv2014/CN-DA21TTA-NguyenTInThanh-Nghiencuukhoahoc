@@ -169,7 +169,13 @@ def plotly_chart():
         df = pd.DataFrame(result)
 
         # Tạo biểu đồ cột sử dụng Plotly
-        fig = px.bar(df, x='TENBOMON', y='SoLuongDeTai', labels={'TENBOMON': 'Bộ Môn', 'SoLuongDeTai': 'Số Lượng Đề Tài'})
+        fig = px.bar(
+            df, 
+            x='TENBOMON', 
+            y='SoLuongDeTai', 
+            labels={'TENBOMON': 'Bộ Môn', 'SoLuongDeTai': 'Số Lượng Đề Tài'},
+            title='Số Lượng Đề Tài Theo Bộ Môn Trong Khoa Kỹ Thuật Công Nghệ'  # Thêm tiêu đề tại đây
+        )
 
         # Chuyển đổi biểu đồ thành dict
         chart_data = fig.to_dict()
@@ -267,17 +273,60 @@ def chart():
         }), 500
 
 
-
-
 @app.route('/api/piechart', methods=['GET'])
 def pie_chart():
     try:
-        # Dữ liệu mẫu từ dataset tips của Plotly
-        df = px.data.tips()
-        
-        # Tạo biểu đồ hình tròn (pie chart)
-        fig = px.pie(df, values='tip', names='day')
-        
+        # Kết nối đến cơ sở dữ liệu
+        connection = get_db_connection()
+        cursor = connection.cursor(pymysql.cursors.DictCursor)
+
+        # Truy vấn tổng số lượng đề tài
+        cursor.execute("""
+            SELECT COUNT(dang_ky_thuc_hien_quy_doi.MAGV) AS TongSoLuongDeTai
+            FROM bomon
+            INNER JOIN giangvien ON bomon.MABOMON = giangvien.MABOMON
+            INNER JOIN khoa ON khoa.MAKHOA = bomon.MAKHOA
+            INNER JOIN dang_ky_thuc_hien_quy_doi ON giangvien.MAGV = dang_ky_thuc_hien_quy_doi.MAGV
+            WHERE khoa.TENKHOA = N'Khoa Kỹ Thuật Công Nghệ';
+        """)
+        total_result = cursor.fetchone()
+        total_projects = total_result['TongSoLuongDeTai']
+
+        # Truy vấn 3 giảng viên có số lượng đề tài nhiều nhất
+        cursor.execute("""
+            SELECT 
+                giangvien.TENGV AS TenGiangVien, 
+                COUNT(dang_ky_thuc_hien_quy_doi.MAGV) AS SoLuongDeTai
+            FROM bomon
+            INNER JOIN giangvien ON bomon.MABOMON = giangvien.MABOMON
+            INNER JOIN khoa ON khoa.MAKHOA = bomon.MAKHOA
+            INNER JOIN dang_ky_thuc_hien_quy_doi ON giangvien.MAGV = dang_ky_thuc_hien_quy_doi.MAGV
+            WHERE khoa.TENKHOA = N'Khoa Kỹ Thuật Công Nghệ'
+            GROUP BY giangvien.TENGV
+            ORDER BY SoLuongDeTai DESC
+            LIMIT 3;
+        """)
+        top3_result = cursor.fetchall()
+
+        # Tính số lượng đề tài còn lại
+        top3_projects = sum(row['SoLuongDeTai'] for row in top3_result)
+        others_projects = total_projects - top3_projects
+
+        # Chuẩn bị dữ liệu cho biểu đồ
+        labels = [row['TenGiangVien'] for row in top3_result] + ['Khác']
+        values = [row['SoLuongDeTai'] for row in top3_result] + [others_projects]
+
+        # Đóng kết nối
+        cursor.close()
+        connection.close()
+
+        # Tạo biểu đồ hình tròn (pie chart) với Plotly
+        fig = px.pie(
+            names=labels, 
+            values=values, 
+            title='Tỷ lệ số lượng đề tài của giảng viên trong khoa'
+        )
+
         # Chuyển đổi biểu đồ thành một dict
         chart_data = fig.to_dict()
 
@@ -309,8 +358,6 @@ def pie_chart():
             "EC": -1,
             "DT": str(e)
         }), 500
-
-
 
 
 # Chạy server

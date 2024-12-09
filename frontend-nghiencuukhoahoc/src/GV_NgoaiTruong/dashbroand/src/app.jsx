@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import Router from "./routes/sections";
 import ThemeProvider from "./theme";
 import Loading from "../../../component/ComponentLoading/CompnentLoading.tsx";
-
+import Footer from "./pages/footer.jsx";
 // ----------------------------------------------------------------------
 
 export default function App() {
@@ -15,6 +15,7 @@ export default function App() {
     <>
       <ThemeProvider>
         <Router />
+        <Footer />
       </ThemeProvider>
     </>
   );

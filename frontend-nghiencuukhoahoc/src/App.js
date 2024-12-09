@@ -19,6 +19,7 @@ function App() {
           <Route path="/truong-bm/*" element={<PrivateRoute />} />
           <Route path="/truongkhoa/*" element={<PrivateRoute />} />
           <Route path="/giang-vien-ngoai-truong/*" element={<PrivateRoute />} />
+          <Route path="/forgot-password" element={<OtpComponent />} />
           <Route path="/login/forgot-password" element={<OtpComponent />} />
         </Routes>
         <ToastContainer

@@ -268,6 +268,83 @@ WHERE
     }
   });
 
+  router.get("/bomondangkynhieunhat", async (req, res) => {
+    try {
+      let [results_ctdt_bomon, fields1] = await pool.execute(
+        `SELECT bomon.TENBOMON, COUNT(dang_ky_thuc_hien_quy_doi.MAGV) AS SoLuongDeTai
+FROM bomon
+INNER JOIN giangvien ON bomon.MABOMON = giangvien.MABOMON
+INNER JOIN khoa ON khoa.MAKHOA = bomon.MAKHOA
+INNER JOIN dang_ky_thuc_hien_quy_doi ON giangvien.MAGV = dang_ky_thuc_hien_quy_doi.MAGV
+WHERE khoa.TENKHOA = N'Khoa Kỹ Thuật Công Nghệ'
+GROUP BY bomon.TENBOMON
+ORDER BY SoLuongDeTai DESC
+LIMIT 1;
+
+`
+      );
+      return res.status(200).json({
+        EM: " mã lớp hoặc chương trình bị rỗng",
+        EC: 200,
+        DT: results_ctdt_bomon,
+      });
+    } catch (err) {
+      console.error("Error fetching hotels:", err.message);
+      res.status(500).json({ message: err.message });
+    }
+  });
+
+  router.get("/laytongsoluong", async (req, res) => {
+    try {
+      let [results_ctdt_bomon, fields1] = await pool.execute(
+        ` SELECT COUNT(dang_ky_thuc_hien_quy_doi.MAGV) AS TongSoLuongDeTai
+FROM bomon
+INNER JOIN giangvien ON bomon.MABOMON = giangvien.MABOMON
+INNER JOIN khoa ON khoa.MAKHOA = bomon.MAKHOA
+INNER JOIN dang_ky_thuc_hien_quy_doi ON giangvien.MAGV = dang_ky_thuc_hien_quy_doi.MAGV
+WHERE khoa.TENKHOA = N'Khoa Kỹ Thuật Công Nghệ';
+
+
+`
+      );
+      return res.status(200).json({
+        EM: " mã lớp hoặc chương trình bị rỗng",
+        EC: 200,
+        DT: results_ctdt_bomon,
+      });
+    } catch (err) {
+      console.error("Error fetching hotels:", err.message);
+      res.status(500).json({ message: err.message });
+    }
+  });
+
+  router.get("/laygiangviendangkynhieunhat", async (req, res) => {
+    try {
+      let [results_ctdt_bomon, fields1] = await pool.execute(
+        ` SELECT 
+    giangvien.TENGV AS TenGiangVien, 
+    COUNT(dang_ky_thuc_hien_quy_doi.MAGV) AS SoLuongDeTai
+FROM bomon
+INNER JOIN giangvien ON bomon.MABOMON = giangvien.MABOMON
+INNER JOIN khoa ON khoa.MAKHOA = bomon.MAKHOA
+INNER JOIN dang_ky_thuc_hien_quy_doi ON giangvien.MAGV = dang_ky_thuc_hien_quy_doi.MAGV
+WHERE khoa.TENKHOA = 'Khoa Kỹ Thuật Công Nghệ'
+GROUP BY giangvien.TENGV
+ORDER BY SoLuongDeTai DESC
+LIMIT 1;
+`
+      );
+      return res.status(200).json({
+        EM: " mã lớp hoặc chương trình bị rỗng",
+        EC: 200,
+        DT: results_ctdt_bomon,
+      });
+    } catch (err) {
+      console.error("Error fetching hotels:", err.message);
+      res.status(500).json({ message: err.message });
+    }
+  });
+
   return app.use("/api/v1/truongkhoa", router);
 };
 
