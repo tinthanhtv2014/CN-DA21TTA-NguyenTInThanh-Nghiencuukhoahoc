@@ -18,7 +18,7 @@ const IndexQuanLydanhsachGV = lazy(() =>
 const AccountGVChangePass = lazy(() =>
   import("../sections/Account/AccountGV-ChangePass")
 );
-const TrangChu = lazy(() => import("../pages/app"));
+const TrangChu = lazy(() => import("../sections/Admincreate/AdminCreate"));
 const UserPage = lazy(() => import("../pages/user"));
 const LoginPage = lazy(() => import("../pages/login"));
 const Page404 = lazy(() => import("../pages/page-not-found"));

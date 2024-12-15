@@ -345,6 +345,74 @@ LIMIT 1;
     }
   });
 
+  router.get(
+    "/laydanhsachgiangviendangkytheobomon/:TENBOMON",
+    async (req, res) => {
+      try {
+        const TENBOMON = req.params.TENBOMON;
+        let [results_ctdt_bomon, fields1] = await pool.execute(
+          `SELECT 
+    giangvien.TENGV AS TenGiangVien, 
+    COUNT(dang_ky_thuc_hien_quy_doi.MAGV) AS SoLuongDeTai
+FROM bomon
+INNER JOIN giangvien 
+    ON bomon.MABOMON = giangvien.MABOMON
+INNER JOIN khoa 
+    ON khoa.MAKHOA = bomon.MAKHOA
+LEFT JOIN dang_ky_thuc_hien_quy_doi 
+    ON giangvien.MAGV = dang_ky_thuc_hien_quy_doi.MAGV
+    AND dang_ky_thuc_hien_quy_doi.MANAMHOC = (
+        SELECT MANAMHOC FROM namhoc WHERE TENNAMHOC = N'Năm Học 2024-2025'
+    ) -- Điều kiện năm học từ tham số
+WHERE bomon.TENBOMON = ?
+GROUP BY giangvien.TENGV
+ORDER BY SoLuongDeTai DESC;
+`,
+          [TENBOMON]
+        );
+        return res.status(200).json({
+          EM: " mã lớp hoặc chương trình bị rỗng",
+          EC: 200,
+          DT: results_ctdt_bomon,
+        });
+      } catch (err) {
+        console.error("Error fetching hotels:", err.message);
+        res.status(500).json({ message: err.message });
+      }
+    }
+  );
+
+  router.get("/laydanhsachchudegiangviendangkynhieunhat", async (req, res) => {
+    try {
+      let [results_ctdt_bomon, fields1] = await pool.execute(
+        `SELECT 
+    giangvien.TENGV AS TenGiangVien, 
+    COUNT(dang_ky_thuc_hien_quy_doi.MAGV) AS SoLuongDeTai,
+    danhmucquydoispkhcn.DON_VI_TINH AS DonViTinh
+FROM giangvien 
+LEFT JOIN taikhoan 
+    ON taikhoan.MAGV = giangvien.MAGV
+LEFT JOIN dang_ky_thuc_hien_quy_doi 
+    ON giangvien.MAGV = dang_ky_thuc_hien_quy_doi.MAGV
+LEFT JOIN danhmucquydoispkhcn 
+    ON dang_ky_thuc_hien_quy_doi.MA_DANH_MUC = danhmucquydoispkhcn.MA_DANH_MUC
+GROUP BY danhmucquydoispkhcn.DON_VI_TINH
+HAVING COUNT(dang_ky_thuc_hien_quy_doi.MAGV) > 0 -- Bỏ qua các giá trị có SoLuongDeTai = 0
+ORDER BY SoLuongDeTai DESC;
+
+`
+      );
+      return res.status(200).json({
+        EM: " mã lớp hoặc chương trình bị rỗng",
+        EC: 200,
+        DT: results_ctdt_bomon,
+      });
+    } catch (err) {
+      console.error("Error fetching hotels:", err.message);
+      res.status(500).json({ message: err.message });
+    }
+  });
+
   return app.use("/api/v1/truongkhoa", router);
 };
 

@@ -32,7 +32,7 @@ const IndexQuanLydanhsachGV = lazy(() =>
 const AccountGVChangePass = lazy(() =>
   import("../sections/Account/AccountGV-ChangePass")
 );
-const IndexPage = lazy(() => import("../pages/app"));
+const IndexPage = lazy(() => import("../sections/Admincreate/AdminCreate"));
 const BlogPage = lazy(() => import("../pages/blog"));
 const UserPage = lazy(() => import("../pages/user"));
 const LoginPage = lazy(() => import("../pages/login"));
