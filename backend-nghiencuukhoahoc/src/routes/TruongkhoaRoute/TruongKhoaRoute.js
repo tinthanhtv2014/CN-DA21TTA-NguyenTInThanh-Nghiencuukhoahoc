@@ -413,6 +413,84 @@ ORDER BY SoLuongDeTai DESC;
     }
   });
 
+  router.post("/laydanhsachcuabanthan", async (req, res) => {
+    try {
+      const TENDANGNHAP = req.body.TENDANGNHAP;
+      let [results_ctdt_bomon, fields1] = await pool.execute(
+        `SELECT k.TENKHOA, bomon.TENBOMON, giangvien.MAGV, giangvien.TENGV,
+       khunggiochuan.*, taikhoan.TENDANGNHAP
+FROM namhoc
+JOIN chon_khung ON namhoc.MANAMHOC = chon_khung.MANAMHOC
+JOIN giangvien ON chon_khung.MAGV = giangvien.MAGV
+JOIN khunggiochuan ON chon_khung.MAKHUNG = khunggiochuan.MAKHUNG
+JOIN bomon ON bomon.MABOMON = giangvien.MABOMON
+JOIN khoa AS k ON k.MAKHOA = bomon.MAKHOA
+JOIN taikhoan ON taikhoan.MAGV = giangvien.MAGV
+WHERE chon_khung.MAGV IS NOT NULL
+  AND taikhoan.TENDANGNHAP = ?
+LIMIT 5;
+`,
+        [TENDANGNHAP]
+      );
+      return res.status(200).json({
+        EM: " mã lớp hoặc chương trình bị rỗng",
+        EC: 200,
+        DT: results_ctdt_bomon,
+      });
+    } catch (err) {
+      console.error("Error fetching hotels:", err.message);
+      res.status(500).json({ message: err.message });
+    }
+  });
+
+  router.get("/laydanhsachloaitacgia", async (req, res) => {
+    try {
+      let [results_ctdt_bomon, fields1] = await pool.execute(
+        `SELECT  loai_tac_gia.TEN_LOAI_TAC_GIA, COUNT(*) AS so_luong_nghien_cuu
+FROM dang_ky_thuc_hien_quy_doi
+JOIN loai_tac_gia ON loai_tac_gia.MA_LOAI_TAC_GIA = dang_ky_thuc_hien_quy_doi.MA_LOAI_TAC_GIA
+GROUP BY loai_tac_gia.MA_LOAI_TAC_GIA, loai_tac_gia.TEN_LOAI_TAC_GIA;
+`
+      );
+      return res.status(200).json({
+        EM: " mã lớp hoặc chương trình bị rỗng",
+        EC: 200,
+        DT: results_ctdt_bomon,
+      });
+    } catch (err) {
+      console.error("Error fetching hotels:", err.message);
+      res.status(500).json({ message: err.message });
+    }
+  });
+
+  router.get("/laydanhsachtheothoigian", async (req, res) => {
+    try {
+      let [results_ctdt_bomon, fields1] = await pool.execute(
+        `SELECT 
+  CASE 
+    WHEN SOGIOQUYDOI BETWEEN 0 AND 100 THEN '0-100 giờ'
+    WHEN SOGIOQUYDOI BETWEEN 101 AND 200 THEN '101-200 giờ'
+    WHEN SOGIOQUYDOI BETWEEN 201 AND 300 THEN '201-300 giờ'
+    WHEN SOGIOQUYDOI BETWEEN 301 AND 400 THEN '301-400 giờ'
+    ELSE 'Khác'
+  END AS GIO_QUY_DOI_KHOANG,
+  COUNT(*) AS so_luong_nghien_cuu
+FROM dang_ky_thuc_hien_quy_doi
+GROUP BY GIO_QUY_DOI_KHOANG;
+
+`
+      );
+      return res.status(200).json({
+        EM: " mã lớp hoặc chương trình bị rỗng",
+        EC: 200,
+        DT: results_ctdt_bomon,
+      });
+    } catch (err) {
+      console.error("Error fetching hotels:", err.message);
+      res.status(500).json({ message: err.message });
+    }
+  });
+
   return app.use("/api/v1/truongkhoa", router);
 };
 

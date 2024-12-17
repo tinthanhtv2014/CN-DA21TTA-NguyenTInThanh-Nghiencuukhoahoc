@@ -15,11 +15,7 @@ const navConfig = [
     path: "/thong-ke",
     icon: icon("ic_analytics"),
   },
-  // {
-  //   title: "Danh sách giảng viên",
-  //   path: "/giang-vien",
-  //   icon: icon("ic_user"),
-  // },
+  // npm 
   {
     title: "Đăng ký khung giờ chuẩn",
     path: "/dang-ky-khung-gio-chuan",

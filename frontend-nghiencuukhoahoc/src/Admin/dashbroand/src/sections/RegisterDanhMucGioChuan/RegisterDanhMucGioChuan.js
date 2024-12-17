@@ -82,6 +82,17 @@ const DangKyDanhMucGioChuan = ({
     useState([]);
 
   const [IsOpenRegister, setIsOpenRegister] = useState(false);
+  const [tendangnhap, setTendangnhap] = useState(null);
+
+  useEffect(() => {
+    const auth = Cookies.get("accessToken");
+    console.log("auth cookie:", auth); // Kiểm tra giá trị cookie
+    if (auth) {
+      const decodeAuth = jwtDecode(auth);
+      console.log("Decoded Auth:", decodeAuth);
+      setTendangnhap(decodeAuth.taikhoan);
+    }
+  }, []);
 
   useEffect(() => {
     const fectData = async () => {
@@ -233,6 +244,46 @@ const DangKyDanhMucGioChuan = ({
     //   await fetchLoaiTacGia(MaLoaiDanhMuc);
     // }
   };
+
+  useEffect(() => {
+    // Hàm lấy thông tin giảng viên của bản thân từ API
+    if (tendangnhap) {
+      const fetchCurrentUser = async () => {
+        try {
+          const response = await CookiesAxios.post(
+            "http://localhost:8081/api/v1/truongkhoa/laydanhsachcuabanthan",
+            { TENDANGNHAP: tendangnhap }
+          );
+          console.log(
+            "cghasdjsahdlashdlashdlkashdlkahdkhaldahdaldaaaaaaaaaaaa",
+            tendangnhap
+          );
+          const giangVien = response.data.DT[0]; // Giả sử API trả về thông tin giảng viên
+          if (response.data.EC === 200) {
+            const newTacGiaList = [...tacGiaList];
+            newTacGiaList[0] = {
+              // Giả sử bạn muốn cập nhật giảng viên đầu tiên trong danh sách
+              ...newTacGiaList[0],
+              maSoGV: giangVien.MAGV,
+              tenGV: giangVien.TENGV,
+              emailGV: giangVien.TENDANGNHAP
+                ? giangVien.TENDANGNHAP
+                : giangVien.EMAIL,
+              boMon: giangVien.TENBOMON,
+              khoa: giangVien.TENKHOA,
+            };
+            setTacGiaList(newTacGiaList);
+          }
+          // Cập nhật dữ liệu giảng viên bản thân
+        } catch (error) {
+          console.error("Lỗi khi lấy thông tin giảng viên:", error);
+        }
+      };
+
+      fetchCurrentUser();
+    }
+  }, [tendangnhap]);
+
   const handleCheckboxChange = (index, field, value) => {
     const newList = [...tacGiaList];
     newList[index][field] = value;
@@ -1019,7 +1070,7 @@ const DangKyDanhMucGioChuan = ({
                               className="responsive-loaitacgia"
                             >
                               <InputLabel id={`loai-tac-gia-label-${index}`}>
-                                Loại Tác Giả {index + 1}
+                                Loại Tác Giả
                               </InputLabel>
                               <Select
                                 labelId={`loai-tac-gia-label-${index}`}

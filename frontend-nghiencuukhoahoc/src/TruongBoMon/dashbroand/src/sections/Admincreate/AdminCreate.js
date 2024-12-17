@@ -13,6 +13,10 @@ import { Line, Bar, Radar } from "react-chartjs-2";
 import "chart.js/auto"; // Để tránh lỗi khi dùng Chart.js 3+
 import Plot from "react-plotly.js";
 import axios from "axios";
+import logo1 from "../../img/clipboard.png";
+import logo2 from "../../img/profile.png";
+import logo3 from "../../img/statistics.png";
+
 import {
   Chart as ChartJS,
   BarElement,
@@ -41,6 +45,8 @@ const AdminCreate = () => {
   const [xuhuong, setxuhuong] = useState(null);
   const [bomon, setBomon] = useState(""); // Trạng thái bộ môn
   const [bomonList, setBomonList] = useState([]); // Danh sách bộ môn
+  const [tacgiachartData, setTacgiaChartData] = useState(null);
+  const [timechartData, setTimeChartData] = useState(null);
   useEffect(() => {
     if (token) {
       const decodedToken = jwtDecode(token);
@@ -153,19 +159,19 @@ const AdminCreate = () => {
 
   const cards = [
     {
-      icon: "bi bi-bar-chart",
+      icon: logo1,
       title: "Bộ môn có số lượng nhiều nhất",
       amount: nhieunhat + ` - ` + soluong + ` Đề tài `,
     },
     {
-      icon: "bi bi-list-ul",
+      icon: logo3,
       title: "Tổng số lượng đề tài của khoa",
-      amount: soluong2,
+      amount: soluong2 + ` Đề tài`,
     },
     {
-      icon: "bi bi-code-alt",
+      icon: logo2,
       title: "Giảng viên đăng ký nhiều nhất",
-      amount: tengiangvien,
+      amount: `Giảng viên: ` + tengiangvien,
     },
   ];
 
@@ -238,6 +244,34 @@ const AdminCreate = () => {
         title: {
           display: true,
           text: "Giảng viên",
+        },
+      },
+    },
+  };
+
+  const options3 = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: "top",
+      },
+      title: {
+        display: true,
+        text: "Thống kê số lượng đề tài của từng giảng viên theo tác giả",
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: "Số lượng đề tài",
+        },
+      },
+      x: {
+        title: {
+          display: true,
+          text: "Tác giả",
         },
       },
     },
@@ -368,8 +402,98 @@ const AdminCreate = () => {
     fontSize: "2rem", // Cái này vẫn giữ nguyên
     color: "#000000", // Màu đen
     marginRight: "1rem",
-    width: "2rem", // Cung cấp chiều rộng
-    height: "2rem", // Cung cấp chiều cao
+    width: "2.8rem", // Cung cấp chiều rộng
+    height: "2.8rem", // Cung cấp chiều cao
+  };
+
+  useEffect(() => {
+    // Fetch data from the API using axios
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8081/api/v1/truongkhoa/laydanhsachloaitacgia"
+        ); // Replace with your actual API URL
+        const data = response.data;
+        if (data.EC === 200) {
+          const chartData = data.DT;
+
+          // Format the data for the Bar chart
+          const labels = chartData.map((item) => item.TEN_LOAI_TAC_GIA);
+          const counts = chartData.map((item) => item.so_luong_nghien_cuu);
+
+          setTacgiaChartData({
+            labels: labels,
+            datasets: [
+              {
+                label: "Số lượng nghiên cứu",
+                data: counts,
+                backgroundColor: "rgba(75, 192, 192, 0.2)",
+                borderColor: "rgba(75, 192, 192, 1)",
+                borderWidth: 1,
+              },
+            ],
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    // Fetch data from the API using axios
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8081/api/v1/truongkhoa/laydanhsachtheothoigian"
+        ); // Replace with your actual API URL
+        const data = response.data;
+        if (data.EC === 200) {
+          const chartData = data.DT;
+
+          // Format the data for the Bar chart (histogram)
+          const labels = chartData.map((item) => item.GIO_QUY_DOI_KHOANG); // These are the ranges, like '0-100 giờ'
+          const counts = chartData.map((item) => item.so_luong_nghien_cuu); // The counts in each range
+
+          setTimeChartData({
+            labels: labels,
+            datasets: [
+              {
+                label: "Số lượng nghiên cứu theo giờ quy đổi",
+                data: counts,
+                backgroundColor: "rgba(75, 192, 192, 0.5)", // Color for the bars
+                borderColor: "rgba(75, 192, 192, 1)", // Border color for the bars
+                borderWidth: 1,
+              },
+            ],
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const TimechartOptions = {
+    responsive: true,
+    scales: {
+      x: {
+        beginAtZero: true, // Ensure the x-axis starts at zero
+      },
+      y: {
+        beginAtZero: true, // Ensure the y-axis starts at zero
+      },
+    },
+    plugins: {
+      title: {
+        display: true, // Hiển thị title
+        text: "Số lượng nghiên cứu theo giờ quy đổi", // Tiêu đề của biểu đồ
+      },
+    },
   };
 
   return (
@@ -522,14 +646,41 @@ const AdminCreate = () => {
                   ...cardStyle,
                   padding: "1rem",
                   width: "400px", // Đặt width cố định nếu cần
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center", // Căn giữa theo chiều ngang
+                  justifyContent: "center", // Căn giữa theo chiều dọc
                 }}
               >
                 <div className="d-flex align-items-center justify-content-between">
-                  <i className={`card-icon ${card.icon}`} style={iconStyle}></i>
-                  <div className="ms-3">
-                    <h5 className="mb-0">{card.title}</h5>
-                    <p className="mb-0">{card.amount}</p>
-                  </div>
+                  <img src={card.icon} alt="" style={iconStyle} />
+                </div>
+
+                <div
+                  className="ms-3"
+                  style={{
+                    padding: "15px", // Khoảng cách bên trong để tạo không gian
+                    textAlign: "center", // Căn giữa nội dung bên trong
+                  }}
+                >
+                  <h5
+                    className="mb-0"
+                    style={{
+                      fontWeight: "bold", // Làm cho tiêu đề đậm
+                      color: "#007bff", // Màu chữ cho tiêu đề (màu xanh dương)
+                    }}
+                  >
+                    {card.title}
+                  </h5>
+                  <p
+                    className="mb-0"
+                    style={{
+                      fontSize: "16px", // Cỡ chữ cho phần thông tin
+                      color: "#333", // Màu chữ cho phần nội dung
+                    }}
+                  >
+                    {card.amount}
+                  </p>
                 </div>
               </div>
             </div>
@@ -612,7 +763,7 @@ const AdminCreate = () => {
               <Radar data={data2} options={options2} />
             </div>
           </div>
-          <div className="col-5" style={{ marginBottom: "40px" }}>
+          <div className="col-5" style={{ marginBottom: "20px" }}>
             <div
               style={{
                 width: "100%",
@@ -637,7 +788,7 @@ const AdminCreate = () => {
               )}
             </div>
           </div>
-          <div className="col-5" style={{ marginBottom: "60px" }}>
+          <div className="col-5" style={{ marginBottom: "20px" }}>
             <div
               style={{
                 marginBottom: "20px",
@@ -683,6 +834,48 @@ const AdminCreate = () => {
             >
               {/* Biểu đồ */}
               <Bar data={data} options={options} />
+            </div>
+          </div>
+          <div className="col-5" style={{ marginBottom: "20px" }}>
+            <div
+              style={{
+                width: "100%",
+                height: "563px",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                backgroundColor: "#f8f9fa",
+                borderRadius: "8px",
+                padding: "10px",
+                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+              }}
+            >
+              {tacgiachartData ? (
+                <Bar data={tacgiachartData} options={options3} />
+              ) : (
+                <p>Đang tải dữ liệu...</p>
+              )}
+            </div>
+          </div>
+          <div className="col-5" style={{ marginBottom: "60px" }}>
+            <div
+              style={{
+                width: "100%",
+                height: "563px",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                backgroundColor: "#f8f9fa",
+                borderRadius: "8px",
+                padding: "10px",
+                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+              }}
+            >
+              {timechartData ? (
+                <Bar data={timechartData} options={TimechartOptions} />
+              ) : (
+                <p>Đang tải dữ liệu...</p>
+              )}
             </div>
           </div>
         </div>
