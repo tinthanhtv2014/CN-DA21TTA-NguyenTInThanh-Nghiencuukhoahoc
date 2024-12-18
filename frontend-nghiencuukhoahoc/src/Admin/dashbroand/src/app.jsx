@@ -15,6 +15,7 @@ export default function App() {
     <>
       <ThemeProvider>
         <Router />
+        <div style={{ margin: "30px 0" }}>aaaa</div>
         <Footer />
       </ThemeProvider>
     </>

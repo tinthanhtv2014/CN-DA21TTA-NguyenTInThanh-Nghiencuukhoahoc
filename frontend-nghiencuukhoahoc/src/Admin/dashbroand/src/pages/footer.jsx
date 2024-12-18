@@ -69,6 +69,7 @@ const Footer = () => {
 };
 const styles = {
   footer: {
+    marginTop: "20%",
     backgroundColor: "#fff", // nền trắng
     color: "#333", // chữ màu xám đậm để dễ đọc trên nền trắng
     padding: "20px 0",
@@ -86,7 +87,7 @@ const styles = {
     alignItems: "center",
     maxWidth: "1200px",
     margin: "0 auto",
-    padding: "0 20px",
+    padding: "0 10px",
   },
   footerLeft: {
     textAlign: "left",
