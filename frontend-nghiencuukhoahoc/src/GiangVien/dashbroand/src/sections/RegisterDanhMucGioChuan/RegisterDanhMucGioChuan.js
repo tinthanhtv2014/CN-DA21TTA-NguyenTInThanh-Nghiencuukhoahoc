@@ -82,6 +82,17 @@ const DangKyDanhMucGioChuan = ({
     useState([]);
 
   const [IsOpenRegister, setIsOpenRegister] = useState(false);
+  const [tendangnhap, setTendangnhap] = useState(null);
+
+  useEffect(() => {
+    const auth = Cookies.get("accessToken");
+    console.log("auth cookie:", auth); // Kiểm tra giá trị cookie
+    if (auth) {
+      const decodeAuth = jwtDecode(auth);
+      console.log("Decoded Auth:", decodeAuth);
+      setTendangnhap(decodeAuth.taikhoan);
+    }
+  }, []);
 
   useEffect(() => {
     const fectData = async () => {
@@ -233,6 +244,46 @@ const DangKyDanhMucGioChuan = ({
     //   await fetchLoaiTacGia(MaLoaiDanhMuc);
     // }
   };
+
+  useEffect(() => {
+    // Hàm lấy thông tin giảng viên của bản thân từ API
+    if (tendangnhap) {
+      const fetchCurrentUser = async () => {
+        try {
+          const response = await CookiesAxios.post(
+            "http://localhost:8081/api/v1/truongkhoa/laydanhsachcuabanthan",
+            { TENDANGNHAP: tendangnhap }
+          );
+          console.log(
+            "cghasdjsahdlashdlashdlkashdlkahdkhaldahdaldaaaaaaaaaaaa",
+            tendangnhap
+          );
+          const giangVien = response.data.DT[0]; // Giả sử API trả về thông tin giảng viên
+          if (response.data.EC === 200) {
+            const newTacGiaList = [...tacGiaList];
+            newTacGiaList[0] = {
+              // Giả sử bạn muốn cập nhật giảng viên đầu tiên trong danh sách
+              ...newTacGiaList[0],
+              maSoGV: giangVien.MAGV,
+              tenGV: giangVien.TENGV,
+              emailGV: giangVien.TENDANGNHAP
+                ? giangVien.TENDANGNHAP
+                : giangVien.EMAIL,
+              boMon: giangVien.TENBOMON,
+              khoa: giangVien.TENKHOA,
+            };
+            setTacGiaList(newTacGiaList);
+          }
+          // Cập nhật dữ liệu giảng viên bản thân
+        } catch (error) {
+          console.error("Lỗi khi lấy thông tin giảng viên:", error);
+        }
+      };
+
+      fetchCurrentUser();
+    }
+  }, [tendangnhap]);
+
   const handleCheckboxChange = (index, field, value) => {
     const newList = [...tacGiaList];
     newList[index][field] = value;
@@ -542,22 +593,28 @@ const DangKyDanhMucGioChuan = ({
               </Button>
             </Col>
             {/* <Col md={4}></Col> */}
-            <Col md={5} className="row-with-border-danhmuc-gate ml-4">
+            <Col md={6} className="row-with-border-danhmuc-gate ml-4">
               {IsOpenCheckKhoa ? (
-                <p className="text-open-gate" style={{ fontSize: "1.1rem" }}>
-                  Thời gian mở cổng từ: &nbsp;
-                  <span className="text-info" style={{ fontSize: "1.1rem" }}>
-                    {startTimeGate}
-                  </span>
-                  &nbsp;đến&nbsp;
-                  <span className="text-info" style={{ fontSize: "1.1rem" }}>
-                    {endTimeGate}
-                  </span>
-                </p>
+                <>
+                  {" "}
+                  <p className="text-open-gate " style={{ fontSize: "1.1rem" }}>
+                    Thời gian mở cổng đăng ký từ: &nbsp;
+                    <span className="text-info" style={{ fontSize: "1.1rem" }}>
+                      {startTimeGate}
+                    </span>
+                    &nbsp;đến&nbsp;
+                    <span className="text-info" style={{ fontSize: "1.1rem" }}>
+                      {endTimeGate}
+                    </span>
+                  </p>
+                </>
               ) : (
-                <p className="text-open-gate" style={{ fontSize: "1.1rem" }}>
-                  Hiện tại khoa của bạn chưa mở cổng đăng ký
-                </p>
+                <>
+                  {" "}
+                  <p className="text-open-gate ">
+                    Hiện tại khoa của bạn chưa mở cổng đăng ký
+                  </p>
+                </>
               )}
             </Col>
           </Row>{" "}
@@ -671,7 +728,7 @@ const DangKyDanhMucGioChuan = ({
                   {/* <p className="text-tendetai "></p> */}
                   <Typography
                     className="text-open-gate detai-b"
-                    sx={{ fontSize: "0.9rem !important" }} // Đảm bảo độ ưu tiên cao
+                    sx={{ fontSize: "0.9rem !important" }}
                   >
                     {TenDeTaiNghienCuu
                       ? TenDeTaiNghienCuu
@@ -717,10 +774,10 @@ const DangKyDanhMucGioChuan = ({
                   </div>
                 </Col>
                 <Col md={4} className="row-with-border-danhmuc ">
-                  <div className="d-flex justify-content-between w-100">
+                  <div className="d-flex justify-content-between w-100 ">
                     <Typography
                       className="text-open-gate"
-                      sx={{ fontSize: "1.2rem !important" }}
+                      style={{ fontSize: "1.1rem" }}
                     >
                       Số Giờ Chuẩn
                     </Typography>
@@ -728,7 +785,7 @@ const DangKyDanhMucGioChuan = ({
                   <div className="d-flex justify-content-between w-100">
                     <Typography
                       className="text-open-gate color-text"
-                      sx={{ fontSize: "1.2rem !important" }}
+                      style={{ fontSize: "1.1rem" }}
                     >
                       {selectedDanhMuc
                         ? selectedDanhMuc.GIO_CHUAN
