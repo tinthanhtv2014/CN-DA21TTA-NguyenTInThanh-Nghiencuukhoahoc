@@ -11,7 +11,7 @@ const {
 const { checkUserJWT } = require("../../middlewares/JWTAction.js");
 const CRUDNamHoc = (app) => {
   // Route cho năm học, yêu cầu xác thực JWT
-  router.get("/xem", checkUserJWT, getAllNAMHOC);
+  router.get("/xem", getAllNAMHOC);
   router.post("/tao", checkUserJWT, createNAMHOC);
   router.put("/sua/:MANAMHOC", checkUserJWT, updateNAMHOC);
   router.delete("/xoa", checkUserJWT, deleteNAMHOC);

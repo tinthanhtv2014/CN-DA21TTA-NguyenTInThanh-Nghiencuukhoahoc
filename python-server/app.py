@@ -142,23 +142,29 @@ def hello_world():
 
 
 
-@app.route('/api/plotly', methods=['GET'])
+@app.route('/api/plotly', methods=['POST'])
 def plotly_chart():
     try:
+        # Lấy TENNAMHOC từ dữ liệu request
+        request_data = request.get_json()  # Lấy dữ liệu JSON từ body request
+        TENNAMHOC = request_data.get('TENNAMHOC')  # Lấy giá trị TENNAMHOC
+
         # Kết nối đến cơ sở dữ liệu
         connection = get_db_connection()
         cursor = connection.cursor(pymysql.cursors.DictCursor)
 
-        # Truy vấn cơ sở dữ liệu
+        # Truy vấn cơ sở dữ liệu với TENNAMHOC
         cursor.execute("""
             SELECT bomon.TENBOMON, COUNT(dang_ky_thuc_hien_quy_doi.MAGV) AS SoLuongDeTai
             FROM bomon
             INNER JOIN giangvien ON bomon.MABOMON = giangvien.MABOMON
             INNER JOIN khoa ON khoa.MAKHOA = bomon.MAKHOA
             INNER JOIN dang_ky_thuc_hien_quy_doi ON giangvien.MAGV = dang_ky_thuc_hien_quy_doi.MAGV
+            INNER JOIN namhoc ON namhoc.MANAMHOC = dang_ky_thuc_hien_quy_doi.MANAMHOC
             WHERE khoa.TENKHOA = N'Khoa Kỹ Thuật Công Nghệ'
+            AND namhoc.TENNAMHOC = %s
             GROUP BY bomon.TENBOMON;
-        """)
+        """, (TENNAMHOC,))  # Truyền TENNAMHOC vào query
         result = cursor.fetchall()
 
         # Đóng kết nối
@@ -273,9 +279,21 @@ def chart():
         }), 500
 
 
-@app.route('/api/piechart', methods=['GET'])
+
+@app.route('/api/piechart', methods=['POST'])
 def pie_chart():
     try:
+        # Lấy TENNAMHOC từ body của request
+        data = request.get_json()
+        tennamhoc = data.get('TENNAMHOC')
+
+        if not tennamhoc:
+            return jsonify({
+                "EM": "Thiếu TENNAMHOC trong request",
+                "EC": -1,
+                "DT": "TENNAMHOC không được truyền vào"
+            }), 400
+
         # Kết nối đến cơ sở dữ liệu
         connection = get_db_connection()
         cursor = connection.cursor(pymysql.cursors.DictCursor)
@@ -287,8 +305,10 @@ def pie_chart():
             INNER JOIN giangvien ON bomon.MABOMON = giangvien.MABOMON
             INNER JOIN khoa ON khoa.MAKHOA = bomon.MAKHOA
             INNER JOIN dang_ky_thuc_hien_quy_doi ON giangvien.MAGV = dang_ky_thuc_hien_quy_doi.MAGV
-            WHERE khoa.TENKHOA = N'Khoa Kỹ Thuật Công Nghệ';
-        """)
+            INNER JOIN namhoc ON namhoc.MANAMHOC = dang_ky_thuc_hien_quy_doi.MANAMHOC
+            WHERE khoa.TENKHOA = N'Khoa Kỹ Thuật Công Nghệ'
+            and namhoc.TENNAMHOC = %s;
+        """, (tennamhoc,))
         total_result = cursor.fetchone()
         total_projects = total_result['TongSoLuongDeTai']
 
@@ -301,11 +321,13 @@ def pie_chart():
             INNER JOIN giangvien ON bomon.MABOMON = giangvien.MABOMON
             INNER JOIN khoa ON khoa.MAKHOA = bomon.MAKHOA
             INNER JOIN dang_ky_thuc_hien_quy_doi ON giangvien.MAGV = dang_ky_thuc_hien_quy_doi.MAGV
+            INNER JOIN namhoc ON namhoc.MANAMHOC = dang_ky_thuc_hien_quy_doi.MANAMHOC
             WHERE khoa.TENKHOA = N'Khoa Kỹ Thuật Công Nghệ'
+             and namhoc.TENNAMHOC = %s
             GROUP BY giangvien.TENGV
             ORDER BY SoLuongDeTai DESC
             LIMIT 3;
-        """)
+        """, (tennamhoc,))
         top3_result = cursor.fetchall()
 
         # Tính số lượng đề tài còn lại
@@ -358,7 +380,6 @@ def pie_chart():
             "EC": -1,
             "DT": str(e)
         }), 500
-
 
 # Chạy server
 if __name__ == '__main__':

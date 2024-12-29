@@ -245,6 +245,10 @@ const AdminCreate = () => {
           display: true,
           text: "Giảng viên",
         },
+        ticks: {
+          maxRotation: 90, // Góc xoay tối đa
+          minRotation: 90, // Góc xoay tối thiểu
+        },
       },
     },
   };
