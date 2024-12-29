@@ -43,11 +43,11 @@
 
 | Tuần | Thời gian         | Nội dung công việc                                               | Người thực hiện |
 |------|-------------------|------------------------------------------------------------------|-----------------|
-| 1    | 06/11-12/11/2023  | - Hoàn thành đề cương chi tiết <br> - Tìm hiểu nghiệp vụ <br> - Phân tích thiết kế cơ sở dữ liệu | Nguyễn Tín Thành |
-| 2    | 20/11-26/11/2023  | - Thiết kế cơ sở dữ liệu <br> - Thiết kế giao diện <br> - Lập trình hệ thống | Nguyễn Tín Thành |
-| 3    | 04/12-10/12/2023  | - Lập trình hệ thống <br> - Viết báo cáo đồ án <br> - Kiểm thử hệ thống | Nguyễn Tín Thành |
-| 4    | 18/12-24/12/2023  | - Hoàn thiện hệ thống <br> - Viết báo cáo đồ án <br> - Thực hiện kiểm thử | Nguyễn Tín Thành |
-| Kết thúc | 25/12-31/12/2023 | - Hoàn chỉnh hệ thống <br> - Nộp báo cáo, hệ thống lên giảng viên | Nguyễn Tín Thành |
+| 1    | 11/11-17/11/2024  | - Tìm hiểu đề tài và xây dựng đề cương. <br> - Tìm hiểu Công nghệ sử dụng và nghiệp vụ. <br> - Xác định yêu cầu. <br> - Phân tích yêu cầu. <br> - Viết báo cáo. <br> - Báo cáo tiến độ với GV hướng dẫn qua Email. | Nguyễn Tín Thành |
+| 2    | 25/11-01/12/2024  | - Thiết lập môi trường, công cụ. <br> - Xây dựng các mô hình hệ thống. <br> - Thiết kế sơ đồ ERD và DFD. <br> - Thiết kế cơ sở dữ liệu <br> - Viết báo cáo. <br> - Báo cáo tiến độ với GV hướng dẫn qua Email. | Nguyễn Tín Thành |
+| 3    | 09/12-15/12/2024  | - Thiết kế giao diện. <br> - Viết báo cáo. <br> - Chạy Demo. <br> - Báo cáo tiến độ với GV hướng dẫn qua Email. | Nguyễn Tín Thành |
+| 4    | 23/12-29/12/2024  | - Xây dựng các chức năng của dự án như: Đăng nhập, đăng ký, phân quyền, đăng ký nghiên cứu khoa học,… <br> - Viết báo cáo đồ án <br> - Báo cáo tiến độ với GV hướng dẫn qua Email. | Nguyễn Tín Thành |
+| Kết thúc | 30/12-05/01/2025 | - Kiểm thử các chức năng của hệ thống từ frontend tới backend. <br> - Chạy Demo. <br> - Báo cáo tiến độ với GV hướng dẫn qua Email. <br> - Viết báo cáo.  | Nguyễn Tín Thành |
 
 ### Hướng dẫn cài đặt dự án:
 
