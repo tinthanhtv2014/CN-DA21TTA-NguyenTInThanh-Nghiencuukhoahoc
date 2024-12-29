@@ -47,6 +47,9 @@ const AdminCreate = () => {
   const [bomonList, setBomonList] = useState([]); // Danh sách bộ môn
   const [tacgiachartData, setTacgiaChartData] = useState(null);
   const [timechartData, setTimeChartData] = useState(null);
+
+  const [namhoc, setNamhoc] = useState(""); // Trạng thái bộ môn
+  const [namhocList, setNamhocList] = useState([]); // Danh sách bộ môn
   useEffect(() => {
     if (token) {
       const decodedToken = jwtDecode(token);
@@ -58,8 +61,11 @@ const AdminCreate = () => {
   }, [token]);
 
   const fetchxuhuongcuacanhan = async () => {
-    const response = await axios.get(
-      `http://localhost:8081/api/v1/truongkhoa/laydanhsachchudegiangviendangkynhieunhat`
+    const response = await axios.post(
+      `http://localhost:8081/api/v1/truongkhoa/laydanhsachchudegiangviendangkynhieunhat`,
+      {
+        TENNAMHOC: namhoc,
+      }
     );
 
     if (response.data.EC === 200) {
@@ -68,8 +74,11 @@ const AdminCreate = () => {
   };
 
   const fetchBomonNhieuNhat = async () => {
-    const response = await axios.get(
-      `http://localhost:8081/api/v1/truongkhoa/bomondangkynhieunhat`
+    const response = await axios.post(
+      `http://localhost:8081/api/v1/truongkhoa/bomondangkynhieunhat`,
+      {
+        TENNAMHOC: namhoc,
+      }
     );
 
     if (response.data.EC === 200) {
@@ -79,8 +88,11 @@ const AdminCreate = () => {
   };
 
   const fetchSoluongNhieuNhat = async () => {
-    const response = await axios.get(
-      `http://localhost:8081/api/v1/truongkhoa/laytongsoluong`
+    const response = await axios.post(
+      `http://localhost:8081/api/v1/truongkhoa/laytongsoluong`,
+      {
+        TENNAMHOC: namhoc,
+      }
     );
 
     if (response.data.EC === 200) {
@@ -89,8 +101,11 @@ const AdminCreate = () => {
   };
 
   const fetchGiangviennhieunhat = async () => {
-    const response = await axios.get(
-      `http://localhost:8081/api/v1/truongkhoa/laygiangviendangkynhieunhat`
+    const response = await axios.post(
+      `http://localhost:8081/api/v1/truongkhoa/laygiangviendangkynhieunhat`,
+      {
+        TENNAMHOC: namhoc,
+      }
     );
 
     if (response.data.EC === 200) {
@@ -103,10 +118,7 @@ const AdminCreate = () => {
       const response = await axios.get(
         `http://localhost:8081/api/v1/admin/bomon/xem`
       );
-      console.log(
-        "check nè ádahaldhjashdlahdklahjdklakldakdhakdakshd",
-        response.data
-      );
+
       if (response.data.EC === 1) {
         setBomonList(response.data.DT);
         setBomon(response.data.DT[0]?.TENBOMON); // Set bộ môn mặc định (nếu có)
@@ -116,10 +128,32 @@ const AdminCreate = () => {
     }
   };
 
-  const fetchGiangvientrongbomon = async (selectedBomon) => {
+  const fetchnamhoc = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:8081/api/v1/truongkhoa/laydanhsachgiangviendangkytheobomon/${selectedBomon}`
+        `http://localhost:8081/api/v1/admin/namhoc/xem`
+      );
+      console.log(
+        "check nè ádahaldhjashdlahdklahjdklakldakdhakdakshd",
+        response.data
+      );
+      if (response.data.EC === 1) {
+        setNamhocList(response.data.DT);
+        setNamhoc(response.data.DT[0]?.TENNAMHOC); // Set bộ môn mặc định (nếu có)
+      }
+    } catch (error) {
+      console.error("Lỗi khi lấy bộ môn", error);
+    }
+  };
+
+  const fetchGiangvientrongbomon = async (selectedBomon) => {
+    try {
+      const response = await axios.post(
+        `http://localhost:8081/api/v1/truongkhoa/laydanhsachgiangviendangkytheobomon/`,
+        {
+          TENNAMHOC: namhoc,
+          TENBOMON: selectedBomon,
+        }
       );
       if (response.data.EC === 200) {
         console.log("Danh sách giảng viên:", response.data.DT);
@@ -130,10 +164,10 @@ const AdminCreate = () => {
     }
   };
   useEffect(() => {
-    if (bomon) {
+    if (bomon && namhoc) {
       fetchGiangvientrongbomon(bomon);
     }
-  }, [bomon]);
+  }, [bomon, namhoc]);
   const calculateTongLuyKe = (soLuongDeTai) => {
     const luyKe = [];
     soLuongDeTai.reduce((acc, curr) => {
@@ -145,9 +179,15 @@ const AdminCreate = () => {
 
   useEffect(() => {
     fetchGiangvientrongbomon();
-    fetchxuhuongcuacanhan();
+
     fetchbomon();
+    fetchnamhoc();
   }, []);
+  useEffect(() => {
+    if (namhoc) {
+      fetchxuhuongcuacanhan();
+    }
+  }, [namhoc]);
 
   useEffect(() => {
     if (danhsach.length > 0) {
@@ -160,7 +200,7 @@ const AdminCreate = () => {
   const cards = [
     {
       icon: logo1,
-      title: "Bộ môn có số lượng nhiều nhất",
+      title: "Bộ môn có số lượng đề tài nhiều nhất",
       amount: nhieunhat + ` - ` + soluong + ` Đề tài `,
     },
     {
@@ -170,7 +210,7 @@ const AdminCreate = () => {
     },
     {
       icon: logo2,
-      title: "Giảng viên đăng ký nhiều nhất",
+      title: "Giảng viên đăng ký nhiều đề tài nhất",
       amount: `Giảng viên: ` + tengiangvien,
     },
   ];
@@ -208,15 +248,15 @@ const AdminCreate = () => {
         borderColor: "rgba(54, 162, 235, 1)",
         borderWidth: 1,
       },
-      {
-        type: "line",
-        label: "Tổng số đề tài lũy kế",
-        data: tongLuyKe, // Lũy kế
-        borderColor: "rgba(255, 99, 132, 1)",
-        borderWidth: 2,
-        fill: false,
-        tension: 0.4, // Đường cong
-      },
+      // {
+      //   type: "line",
+      //   label: "Tổng số đề tài lũy kế",
+      //   data: tongLuyKe, // Lũy kế
+      //   borderColor: "rgba(255, 99, 132, 1)",
+      //   borderWidth: 2,
+      //   fill: false,
+      //   tension: 0.4, // Đường cong
+      // },
     ],
   };
 
@@ -244,10 +284,6 @@ const AdminCreate = () => {
         title: {
           display: true,
           text: "Giảng viên",
-        },
-        ticks: {
-          maxRotation: 90, // Góc xoay tối đa
-          minRotation: 90, // Góc xoay tối thiểu
         },
       },
     },
@@ -313,7 +349,7 @@ const AdminCreate = () => {
   const data2 = {
     labels:
       xuhuong && xuhuong.length > 0
-        ? xuhuong.map((item) => item.DonViTinh)
+        ? xuhuong.map((item) => item.DonViTinh + " nghiên cứu khoa học")
         : [], // Đơn vị tính (tạo nhãn cho các trục của radar chart)
     datasets: [
       {
@@ -330,66 +366,73 @@ const AdminCreate = () => {
   };
 
   useEffect(() => {
-    // Gọi API từ server Python để lấy dữ liệu biểu đồ
-    fetch("http://localhost:5000/api/plotly")
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.EM === "Success") {
-          // Giả sử data.DT là đối tượng JSON với dữ liệu biểu đồ
-          try {
-            console.log(data.DT); // Kiểm tra dữ liệu nhận được
-            setChartData(data.DT);
-          } catch (e) {
-            console.error("Error parsing chart data:", e);
-          }
-        } else {
-          console.error("Error fetching chart:", data.EM);
-        }
+    if (namhoc) {
+      // Định nghĩa TENNAMHOC bạn muốn gửi
+      const TENNAMHOC = namhoc; // Thay đổi giá trị này tùy theo yêu cầu
+
+      // Gọi API từ server Python để lấy dữ liệu biểu đồ
+      fetch("http://localhost:5000/api/plotly", {
+        method: "POST", // Chuyển phương thức thành POST
+        headers: {
+          "Content-Type": "application/json", // Đảm bảo gửi dữ liệu dưới dạng JSON
+        },
+        body: JSON.stringify({ TENNAMHOC }), // Gửi TENNAMHOC trong body request
       })
-      .catch((error) => console.error("Error fetching chart data:", error));
-    fetchBomonNhieuNhat();
-    fetchSoluongNhieuNhat();
-    fetchGiangviennhieunhat();
-  }, []);
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.EM === "Success") {
+            // Giả sử data.DT là đối tượng JSON với dữ liệu biểu đồ
+            try {
+              console.log(data.DT); // Kiểm tra dữ liệu nhận được
+              setChartData(data.DT);
+            } catch (e) {
+              console.error("Error parsing chart data:", e);
+            }
+          } else {
+            console.error("Error fetching chart:", data.EM);
+          }
+        })
+        .catch((error) => console.error("Error fetching chart data:", error));
+
+      fetchBomonNhieuNhat();
+      fetchSoluongNhieuNhat();
+      fetchGiangviennhieunhat();
+    }
+  }, [namhoc]);
 
   useEffect(() => {
-    // Gọi API từ server Python để lấy dữ liệu biểu đồ
-    fetch("http://localhost:5000/api/chart")
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.EM === "Success") {
-          // Giả sử data.DT là đối tượng JSON với dữ liệu biểu đồ
-          try {
-            console.log(data.DT); // Kiểm tra dữ liệu nhận được
-            setChartData2(data.DT);
-          } catch (e) {
-            console.error("Error parsing chart data:", e);
-          }
-        } else {
-          console.error("Error fetching chart:", data.EM);
-        }
+    if (namhoc) {
+      // Dữ liệu cần truyền vào API (TENNAMHOC)
+      const requestData = {
+        TENNAMHOC: namhoc, // Thay thế bằng giá trị cần truyền
+      };
+
+      // Gọi API từ server Python để lấy dữ liệu biểu đồ
+      fetch("http://localhost:5000/api/piechart", {
+        method: "POST", // Thay đổi thành POST
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestData), // Truyền dữ liệu TENNAMHOC
       })
-      .catch((error) => console.error("Error fetching chart data:", error));
-  }, []);
-  useEffect(() => {
-    // Gọi API từ server Python để lấy dữ liệu biểu đồ
-    fetch("http://localhost:5000/api/piechart")
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.EM === "Success") {
-          // Giả sử data.DT là đối tượng JSON với dữ liệu biểu đồ
-          try {
-            console.log(data.DT); // Kiểm tra dữ liệu nhận được
-            setChartData3(data.DT);
-          } catch (e) {
-            console.error("Error parsing chart data:", e);
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.EM === "Success") {
+            // Giả sử data.DT là đối tượng JSON với dữ liệu biểu đồ
+            try {
+              console.log(data.DT); // Kiểm tra dữ liệu nhận được
+              setChartData3(data.DT);
+            } catch (e) {
+              console.error("Error parsing chart data:", e);
+            }
+          } else {
+            console.error("Error fetching chart:", data.EM);
           }
-        } else {
-          console.error("Error fetching chart:", data.EM);
-        }
-      })
-      .catch((error) => console.error("Error fetching chart data:", error));
-  }, []);
+        })
+        .catch((error) => console.error("Error fetching chart data:", error));
+    }
+  }, [namhoc]);
+
   const cardStyle = {
     backgroundColor: "#f8f9fa", // Đồng bộ màu nền với biểu đồ
     color: "black", // Điều chỉnh màu chữ để tương phản
@@ -615,6 +658,36 @@ const AdminCreate = () => {
     //   </Container>
     // </>
     <>
+      <div
+        style={{
+          marginBottom: "20px",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        {/* Dropdown chọn bộ môn */}
+        <select
+          value={namhoc}
+          onChange={(e) => setNamhoc(e.target.value)} // Cập nhật bộ môn khi thay đổi
+          style={{
+            padding: "10px",
+            fontSize: "16px",
+            marginRight: "20px",
+            borderRadius: "4px",
+            border: "1px solid #ccc",
+          }}
+        >
+          {namhocList &&
+            namhocList.length > 0 &&
+            namhocList.map((item) => (
+              <option key={item.MANAMHOC} value={item.TENNAMHOC}>
+                {item.TENNAMHOC}
+              </option>
+            ))}
+        </select>
+      </div>
+
       <div
         className="row g-4"
         style={{
