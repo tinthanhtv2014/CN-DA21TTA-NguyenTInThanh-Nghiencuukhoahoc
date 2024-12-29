@@ -1,72 +1,110 @@
-# Managing and Optimizing Faculty Teaching Hours
 
-This project is aimed at managing and optimizing faculty teaching hours using a web application built with React.js and Node.js. The backend uses MySQL for data storage.
+# Xây dựng hệ thống quản lý đăng ký giờ nhiệm vụ của giảng viên Khoa Kỹ thuật và Công nghệ
 
-## Table of Contents
+**Giáo viên hướng dẫn:** Phạm Thị Trúc Mai  
+**Sinh viên thực hiện:** Nguyễn Tín Thành - 110121104 - DA21TTA  
+**Email:** tinthanhtv2014@gmail.com  
+**Số điện thoại:** 0395890398  
 
-- [Getting Started](#getting-started)
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Running the Application](#running-the-application)
-- [Built With](#built-with)
-- [Contributing](#contributing)
-- [License](#license)
+### Mô tả đề tài:
 
-## Getting Started
+- **Mục tiêu:**
+  - Xây dựng hệ thống quản lý đăng ký giờ nhiệm vụ của giảng viên, bao gồm việc quản lý thông tin về giờ làm việc, nghiên cứu khoa học và nhiệm vụ khác của giảng viên trong Khoa Kỹ thuật và Công nghệ.
+  - Cung cấp khả năng thống kê, báo cáo các hoạt động nghiên cứu khoa học của giảng viên.
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+- **Chức năng cho quản trị viên:**
+  - Quản lý thông tin giảng viên: Thêm, sửa, xóa và tìm kiếm giảng viên.
+  - Quản lý giờ nhiệm vụ: Đăng ký, cập nhật, xóa giờ nhiệm vụ của giảng viên.
+  - Thống kê: Hiển thị báo cáo thống kê về số giờ nghiên cứu khoa học, số giờ giảng dạy.
 
-### Prerequisites
+- **Chức năng cho giảng viên:**
+  - Đăng ký giờ nhiệm vụ: Giảng viên có thể đăng ký giờ làm việc và các nhiệm vụ nghiên cứu khoa học.
+  - Xem thông tin nhiệm vụ của mình: Xem thông tin về giờ làm việc và các nhiệm vụ nghiên cứu đã đăng ký.
 
-You will need the following software installed on your machine:
+### Phương pháp thực hiện:
 
-- Node.js (v14 or higher)
-- MySQL
-- Git
+1. **Tìm kiếm và Nghiên cứu:**
+   - Tìm hiểu thông tin liên quan đến việc quản lý giờ nhiệm vụ giảng viên.
+   - Nghiên cứu tài liệu để xác định yêu cầu và chức năng của hệ thống.
 
-### Installation
+2. **Phân tích và Thiết kế:**
+   - Phân tích yêu cầu bài toán và thiết kế cơ sở dữ liệu.
+   - Thiết kế giao diện người dùng và hệ thống quản lý.
 
-1. Clone the repository:
+3. **Lập trình và Triển khai:**
+   - Lập trình website theo thiết kế đã xác định.
+   - Triển khai hệ thống trên môi trường thử nghiệm.
+
+4. **Kết quả đạt được:**
+   - Hoàn thành xây dựng hệ thống quản lý giờ nhiệm vụ giảng viên.
+   - Hoàn thiện quyển báo cáo đồ án và triển khai hệ thống thực tế.
+
+### Kế hoạch thực hiện:
+
+| Tuần | Thời gian         | Nội dung công việc                                               | Người thực hiện |
+|------|-------------------|------------------------------------------------------------------|-----------------|
+| 1    | 11/11-17/11/2024  | - Tìm hiểu đề tài và xây dựng đề cương. <br> - Tìm hiểu Công nghệ sử dụng và nghiệp vụ. <br> - Xác định yêu cầu. <br> - Phân tích yêu cầu. <br> - Viết báo cáo. <br> - Báo cáo tiến độ với GV hướng dẫn qua Email. | Nguyễn Tín Thành |
+| 2    | 25/11-01/12/2024  | - Thiết lập môi trường, công cụ. <br> - Xây dựng các mô hình hệ thống. <br> - Thiết kế sơ đồ ERD và DFD. <br> - Thiết kế cơ sở dữ liệu <br> - Viết báo cáo. <br> - Báo cáo tiến độ với GV hướng dẫn qua Email. | Nguyễn Tín Thành |
+| 3    | 09/12-15/12/2024  | - Thiết kế giao diện. <br> - Viết báo cáo. <br> - Chạy Demo. <br> - Báo cáo tiến độ với GV hướng dẫn qua Email. | Nguyễn Tín Thành |
+| 4    | 23/12-29/12/2024  | - Xây dựng các chức năng của dự án như: Đăng nhập, đăng ký, phân quyền, đăng ký nghiên cứu khoa học,… <br> - Viết báo cáo đồ án <br> - Báo cáo tiến độ với GV hướng dẫn qua Email. | Nguyễn Tín Thành |
+| Kết thúc | 30/12-05/01/2025 | - Kiểm thử các chức năng của hệ thống từ frontend tới backend. <br> - Chạy Demo. <br> - Báo cáo tiến độ với GV hướng dẫn qua Email. <br> - Viết báo cáo.  | Nguyễn Tín Thành |
+
+### Hướng dẫn cài đặt dự án:
+
+**Yêu cầu:**
+- Xampp
+- Node.js
+- npm
+
+**Cài Đặt:**
+
+1. **Clone Repository:**
    ```bash
-   git clone https://github.com/yourusername/managing-and-optimizing-faculty-teaching-hours.git
-   cd managing-and-optimizing-faculty-teaching-hours
+   git clone https://github.com/tinthanhtv2014/csn-da21tta-nguyentinthanh-banquanao-nodejs.git
+   ```
 
-2. Install backend dependencies:
+2. **Cài Đặt Dependencies:**
+
+   - Di chuyển vào thư mục `src_nodejs` và cài đặt dependencies:
    ```bash
-   cd backend
    npm install
-3. Install frontend dependencies:
-    ```cd ../frontend
-    npm install 
-4. Install backend dependencies:
-    ```# Server configuration
-    PORT=8081
-    URL_REACT=http://localhost:3000
+   ```
 
-    # Database configuration 
-    HOST_NAME=localhost  
-    NODE_ENV=development
-    DB_HOST=localhost
-    DB_PORT=3306
-    DB_USER=root
-    DB_NAME=faculty_management
-    DB_PASSWORD=yourpassword
+3. **Cấu Hình Môi Trường:**
 
-    # JWT configuration
-    SECRETKEYADMIN=your_secret_key.
+   - Tạo tệp `.env` từ tệp `.env.example` và điền thông tin cần thiết (cấu hình môi trường trong dự án).
 
-## Running the Application
-Backend   
- Start the backend server  
+4. **Chạy Ứng Dụng:**
 
-    
-    npm start  
+   - Import file `src/quanlygio.sql` vào Xampp.
+   - Mở Visual Studio Code và mở dự án.
+   - Di chuyển đến thư mục `src_nodejs` và chạy ứng dụng:
+   ```bash
+   npm run start
+   ```
 
-Frontend   
-Start the frontend   
+   - Hoặc sử dụng `nodemon` để tự động khởi động lại ứng dụng khi có thay đổi:
+   ```bash
+   npm install -g nodemon
+   nodemon
+   ```
 
-    npm start
-   
-## 🚀 About Me
-we are a full stack developer...
+### Đóng Góp:
+
+Nếu bạn muốn đóng góp vào dự án, vui lòng làm theo các bước sau:
+1. Fork dự án
+2. Tạo nhánh mới (`git checkout -b feature/awesome-feature`)
+3. Commit thay đổi của bạn (`git commit -am 'Add some awesome feature'`)
+4. Push đến nhánh của bạn (`git push origin feature/awesome-feature`)
+5. Tạo Pull Request
+
+### Liên Hệ:
+
+- **Trường Đại học:** Đại học Trà Vinh
+- **Lớp:** DA21TTA
+- **Tên:** Nguyễn Tín Thành
+- **Email:** [tinthanhtv2014@gmail.com](mailto:tinthanhtv2014@gmail.com)
+
+--- 
+
+Hy vọng bản sửa lại này sẽ phù hợp với yêu cầu của bạn!
