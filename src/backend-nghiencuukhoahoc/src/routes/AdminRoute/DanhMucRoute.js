@@ -60,7 +60,7 @@ const CRUDDanhMuc = (app) => {
   router.delete("/loaidanhmuc/:id", checkUserJWT, removeLoaiDanhMuc);
 
   // Route cho các API quản lý loại tác giả, yêu cầu xác thực JWT
-  router.get("/loaitacgia", checkUserJWT, getLoaiTacGia);
+  router.get("/loaitacgia", getLoaiTacGia);
   router.post("/loaitacgia", checkUserJWT, addLoaiTacGia);
   router.put("/loaitacgia/:id", checkUserJWT, editLoaiTacGia);
   router.delete("/loaitacgia/:id", checkUserJWT, removeLoaiTacGia);

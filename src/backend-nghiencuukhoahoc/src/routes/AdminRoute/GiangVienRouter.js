@@ -40,7 +40,7 @@ const CRUDGiangVien = (app) => {
 
   router.post("/xem", checkUserJWT, getAllGiangVien);
 
-  router.get("/only/xem/:MABOMON", checkUserJWT, getOnlyGiangVienbyBoMon);
+  router.get("/only/xem/:MABOMON", getOnlyGiangVienbyBoMon);
   router.get(
     "/only/xemprofile/:TENDANGNHAP",
     checkUserJWT,

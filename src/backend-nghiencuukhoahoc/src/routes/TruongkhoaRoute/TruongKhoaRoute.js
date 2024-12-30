@@ -478,23 +478,111 @@ GROUP BY loai_tac_gia.MA_LOAI_TAC_GIA, loai_tac_gia.TEN_LOAI_TAC_GIA;
     }
   });
 
-  router.get("/laydanhsachtheothoigian", async (req, res) => {
+  router.post("/laydanhsachtheotheloaitacgia", async (req, res) => {
     try {
+      const TEN_LOAI_TAC_GIA = req.body.TEN_LOAI_TAC_GIA;
+      const TENNAMHOC = req.body.TENNAMHOC;
+      let [results_ctdt_bomon, fields1] = await pool.execute(
+        `SELECT  
+    giangvien.TENGV, 
+    COUNT(dang_ky_thuc_hien_quy_doi.MA_DANH_MUC ) AS so_luong_nghien_cuu
+FROM 
+    dang_ky_thuc_hien_quy_doi
+JOIN 
+    loai_tac_gia ON loai_tac_gia.MA_LOAI_TAC_GIA = dang_ky_thuc_hien_quy_doi.MA_LOAI_TAC_GIA
+JOIN 
+    giangvien ON giangvien.MAGV = dang_ky_thuc_hien_quy_doi.MAGV
+JOIN 
+    namhoc ON namhoc.MANAMHOC = dang_ky_thuc_hien_quy_doi.MANAMHOC
+WHERE 
+    loai_tac_gia.TEN_LOAI_TAC_GIA = ?
+    AND namhoc.TENNAMHOC = ?
+GROUP BY 
+    giangvien.TENGV;
+`,
+        [TEN_LOAI_TAC_GIA, TENNAMHOC]
+      );
+      return res.status(200).json({
+        EM: " mã lớp hoặc chương trình bị rỗng",
+        EC: 200,
+        DT: results_ctdt_bomon,
+      });
+    } catch (err) {
+      console.error("Error fetching hotels:", err.message);
+      res.status(500).json({ message: err.message });
+    }
+  });
+
+  router.post("/laydanhsachtheotheloaitacgia", async (req, res) => {
+    try {
+      const TENGV = req.body.TEN_LOAI_TAC_GIA;
+      const TENNAMHOC = req.body.TENNAMHOC;
+      let [results_ctdt_bomon, fields1] = await pool.execute(
+        `SELECT  
+    giangvien.TENGV, 
+    COUNT(dang_ky_thuc_hien_quy_doi.MA_DANH_MUC ) AS so_luong_nghien_cuu
+FROM 
+    dang_ky_thuc_hien_quy_doi
+JOIN 
+    loai_tac_gia ON loai_tac_gia.MA_LOAI_TAC_GIA = dang_ky_thuc_hien_quy_doi.MA_LOAI_TAC_GIA
+JOIN 
+    giangvien ON giangvien.MAGV = dang_ky_thuc_hien_quy_doi.MAGV
+JOIN 
+    namhoc ON namhoc.MANAMHOC = dang_ky_thuc_hien_quy_doi.MANAMHOC
+WHERE 
+    loai_tac_gia.TEN_LOAI_TAC_GIA = ?
+    AND namhoc.TENNAMHOC = ?
+GROUP BY 
+    giangvien.TENGV;
+`,
+        [TEN_LOAI_TAC_GIA, TENNAMHOC]
+      );
+      return res.status(200).json({
+        EM: " mã lớp hoặc chương trình bị rỗng",
+        EC: 200,
+        DT: results_ctdt_bomon,
+      });
+    } catch (err) {
+      console.error("Error fetching hotels:", err.message);
+      res.status(500).json({ message: err.message });
+    }
+  });
+
+  router.post("/laydanhsachtheodetaicanhan", async (req, res) => {
+    try {
+      const TENGV = req.body.TENGV;
+      const TENNAMHOC = req.body.TENNAMHOC;
+
       let [results_ctdt_bomon, fields1] = await pool.execute(
         `SELECT 
-  CASE 
-    WHEN SOGIOQUYDOI BETWEEN 0 AND 100 THEN '0-100 giờ'
-    WHEN SOGIOQUYDOI BETWEEN 101 AND 200 THEN '101-200 giờ'
-    WHEN SOGIOQUYDOI BETWEEN 201 AND 300 THEN '201-300 giờ'
-    WHEN SOGIOQUYDOI BETWEEN 301 AND 400 THEN '301-400 giờ'
-    ELSE 'Khác'
-  END AS GIO_QUY_DOI_KHOANG,
-  COUNT(*) AS so_luong_nghien_cuu
-FROM dang_ky_thuc_hien_quy_doi
-GROUP BY GIO_QUY_DOI_KHOANG;
+    dang_ky_thuc_hien_quy_doi.TEN_DE_TAI,
+    namhoc.TENNAMHOC,
+    IFNULL(GROUP_CONCAT(DISTINCT giangvien.TENGV ORDER BY giangvien.TENGV SEPARATOR ', '), '') AS GiangVienGop
+FROM 
+    loai_tac_gia
+JOIN 
+    dang_ky_thuc_hien_quy_doi ON loai_tac_gia.MA_LOAI_TAC_GIA = dang_ky_thuc_hien_quy_doi.MA_LOAI_TAC_GIA
+JOIN 
+    giangvien ON giangvien.MAGV = dang_ky_thuc_hien_quy_doi.MAGV
+JOIN 
+    namhoc ON namhoc.MANAMHOC = dang_ky_thuc_hien_quy_doi.MANAMHOC
+JOIN 
+    nghien_cuu_kh ON dang_ky_thuc_hien_quy_doi.TEN_DE_TAI = nghien_cuu_kh.TEN_DE_TAI
+WHERE 
+    namhoc.TENNAMHOC = ?
+    AND dang_ky_thuc_hien_quy_doi.TEN_DE_TAI IN (
+        SELECT dang_ky_thuc_hien_quy_doi.TEN_DE_TAI
+        FROM dang_ky_thuc_hien_quy_doi
+        JOIN giangvien ON giangvien.MAGV = dang_ky_thuc_hien_quy_doi.MAGV
+        WHERE giangvien.TENGV = ?
+    )
+GROUP BY 
+    dang_ky_thuc_hien_quy_doi.TEN_DE_TAI;
 
-`
+`,
+        [TENNAMHOC, TENGV]
       );
+      console.log(results_ctdt_bomon);
       return res.status(200).json({
         EM: " mã lớp hoặc chương trình bị rỗng",
         EC: 200,
