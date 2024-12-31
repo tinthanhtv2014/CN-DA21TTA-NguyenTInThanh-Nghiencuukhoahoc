@@ -191,6 +191,151 @@ WHERE
     // }
   });
 
+  router.post("/laytongsoluong", async (req, res) => {
+    try {
+      const TENNAMHOC = req.body.TENNAMHOC;
+      const TENDANGNHAP = req.body.TENDANGNHAP;
+      let [timkiem] = await pool.execute(
+        ` select * from taikhoan,giangvien where taikhoan.MAGV = giangvien.MAGV
+        and taikhoan.TENDANGNHAP = ?
+`,
+        [TENDANGNHAP]
+      );
+
+      let [results_ctdt_bomon, fields1] = await pool.execute(
+        ` SELECT COUNT(dang_ky_thuc_hien_quy_doi.MAGV) AS TongSoLuongDeTai
+FROM bomon
+INNER JOIN giangvien ON bomon.MABOMON = giangvien.MABOMON
+INNER JOIN khoa ON khoa.MAKHOA = bomon.MAKHOA
+INNER JOIN dang_ky_thuc_hien_quy_doi ON giangvien.MAGV = dang_ky_thuc_hien_quy_doi.MAGV
+INNER JOIN namhoc ON namhoc.MANAMHOC = dang_ky_thuc_hien_quy_doi.MANAMHOC
+WHERE bomon.MABOMON = ?
+AND namhoc.TENNAMHOC = ?
+
+`,
+        [timkiem[0].MABOMON, TENNAMHOC]
+      );
+      return res.status(200).json({
+        EM: " mã lớp hoặc chương trình bị rỗng",
+        EC: 200,
+        DT: results_ctdt_bomon,
+      });
+    } catch (err) {
+      console.error("Error fetching hotelsaaaaa:", err.message);
+      res.status(500).json({ message: err.message });
+    }
+  });
+
+  router.post("/laygiangviendangkynhieunhat", async (req, res) => {
+    try {
+      const TENNAMHOC = req.body.TENNAMHOC;
+      const TENDANGNHAP = req.body.TENDANGNHAP;
+
+      let [timkiem] = await pool.execute(
+        ` select * from taikhoan,giangvien where taikhoan.MAGV = giangvien.MAGV
+        and taikhoan.TENDANGNHAP = ?
+`,
+        [TENDANGNHAP]
+      );
+
+      let [results_ctdt_bomon, fields1] = await pool.execute(
+        ` SELECT 
+    giangvien.TENGV AS TenGiangVien, 
+    COUNT(dang_ky_thuc_hien_quy_doi.MAGV) AS SoLuongDeTai
+FROM bomon
+INNER JOIN giangvien ON bomon.MABOMON = giangvien.MABOMON
+INNER JOIN khoa ON khoa.MAKHOA = bomon.MAKHOA
+INNER JOIN dang_ky_thuc_hien_quy_doi ON giangvien.MAGV = dang_ky_thuc_hien_quy_doi.MAGV
+INNER JOIN namhoc ON namhoc.MANAMHOC = dang_ky_thuc_hien_quy_doi.MANAMHOC
+WHERE bomon.MABOMON = ?
+AND namhoc.TENNAMHOC = ?
+GROUP BY giangvien.TENGV
+ORDER BY SoLuongDeTai DESC
+LIMIT 1;
+`,
+        [timkiem[0].MABOMON, TENNAMHOC]
+      );
+      return res.status(200).json({
+        EM: " mã lớp hoặc chương trình bị rỗng",
+        EC: 200,
+        DT: results_ctdt_bomon,
+      });
+    } catch (err) {
+      console.error("Error fetching hotelsaaaa:", err.message);
+      res.status(500).json({ message: err.message });
+    }
+  });
+
+  router.post("/laydanhsachgiangviendangkytheobomon", async (req, res) => {
+    try {
+      const TENNAMHOC = req.body.TENNAMHOC;
+      const TENDANGNHAP = req.body.TENDANGNHAP;
+
+      let [timkiem] = await pool.execute(
+        ` select * from taikhoan,giangvien where taikhoan.MAGV = giangvien.MAGV
+        and taikhoan.TENDANGNHAP = ?
+`,
+        [TENDANGNHAP]
+      );
+
+      let [results_ctdt_bomon, fields1] = await pool.execute(
+        `SELECT 
+    giangvien.TENGV AS TenGiangVien, 
+    COUNT(dang_ky_thuc_hien_quy_doi.MAGV) AS SoLuongDeTai
+FROM bomon
+INNER JOIN giangvien 
+    ON bomon.MABOMON = giangvien.MABOMON
+INNER JOIN khoa 
+    ON khoa.MAKHOA = bomon.MAKHOA
+LEFT JOIN dang_ky_thuc_hien_quy_doi 
+    ON giangvien.MAGV = dang_ky_thuc_hien_quy_doi.MAGV
+    AND dang_ky_thuc_hien_quy_doi.MANAMHOC = (
+        SELECT MANAMHOC FROM namhoc WHERE TENNAMHOC = ?
+    ) -- Điều kiện năm học từ tham số
+WHERE bomon.MABOMON = ?
+GROUP BY giangvien.TENGV
+ORDER BY SoLuongDeTai DESC;
+`,
+        [TENNAMHOC, timkiem[0].MABOMON]
+      );
+      return res.status(200).json({
+        EM: " mã lớp hoặc chương trình bị rỗng",
+        EC: 200,
+        DT: results_ctdt_bomon,
+      });
+    } catch (err) {
+      console.error("Error fetching hotels:", err.message);
+      res.status(500).json({ message: err.message });
+    }
+  });
+
+  router.post("/laydanhsachgiangvien", async (req, res) => {
+    try {
+      const TENDANGNHAP = req.body.TENDANGNHAP;
+
+      let [timkiem] = await pool.execute(
+        ` select * from taikhoan,giangvien where taikhoan.MAGV = giangvien.MAGV
+        and taikhoan.TENDANGNHAP = ?
+`,
+        [TENDANGNHAP]
+      );
+
+      let [results_ctdt_bomon, fields1] = await pool.execute(
+        `select * from giangvien where giangvien.MABOMON = ?
+`,
+        [timkiem[0].MABOMON]
+      );
+      return res.status(200).json({
+        EM: " mã lớp hoặc chương trình bị rỗng",
+        EC: 200,
+        DT: results_ctdt_bomon,
+      });
+    } catch (err) {
+      console.error("Error fetching hotels:", err.message);
+      res.status(500).json({ message: err.message });
+    }
+  });
+
   return app.use("/api/v1/truongbomon/giangvien", router);
 };
 

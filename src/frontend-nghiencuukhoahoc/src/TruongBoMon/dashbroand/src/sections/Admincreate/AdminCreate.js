@@ -9,13 +9,23 @@ import "./AdminCreate.scss";
 import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
-import { Line, Bar, Radar } from "react-chartjs-2";
+import { Line, Bar, Radar, Scatter } from "react-chartjs-2";
 import "chart.js/auto"; // Để tránh lỗi khi dùng Chart.js 3+
 import Plot from "react-plotly.js";
 import axios from "axios";
 import logo1 from "../../img/clipboard.png";
 import logo2 from "../../img/profile.png";
 import logo3 from "../../img/statistics.png";
+import {
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TablePagination,
+  TableRow,
+} from "@mui/material";
 
 import {
   Chart as ChartJS,
@@ -46,19 +56,41 @@ const AdminCreate = () => {
   const [bomon, setBomon] = useState(""); // Trạng thái bộ môn
   const [bomonList, setBomonList] = useState([]); // Danh sách bộ môn
   const [tacgiachartData, setTacgiaChartData] = useState(null);
-  const [timechartData, setTimeChartData] = useState(null);
-
+  const [scatterChartData, setScatterChartData] = useState({
+    labels: [],
+    datasets: [
+      {
+        label: "Số lượng nghiên cứu",
+        data: [],
+        backgroundColor: "rgba(255, 99, 132, 0.5)",
+        borderColor: "rgba(255, 99, 132, 1)",
+      },
+    ],
+  });
+  const [mabomon, setMabomon] = useState(""); // Trạng thái bộ môn
+  const [mabomonList, setMabomonList] = useState(""); // Trạng thái bộ môn
+  const [giangvien, setGiangvien] = useState(""); // Trạng thái bộ môn
+  const [giangvienList, setGiangvienList] = useState([]); // Trạng thái bộ môn
   const [namhoc, setNamhoc] = useState(""); // Trạng thái bộ môn
   const [namhocList, setNamhocList] = useState([]); // Danh sách bộ môn
+  const [loaitacgia, setLoaitacgia] = useState(""); // Trạng thái bộ môn
+  const [loaitacgiaList, setLoaitacgiaList] = useState([]); // Danh sách bộ môn
+  const [datapage, setData] = useState([]); // Dữ liệu API
+  const [page, setPage] = useState(0); // Trang hiện tại
+  const [rowsPerPage, setRowsPerPage] = useState(5); // Số lượng hàng mỗi trang
+  const [loading, setLoading] = useState(false);
+  const [ten, setTen] = useState(null);
   useEffect(() => {
     if (token) {
       const decodedToken = jwtDecode(token);
       const name = decodedToken.phanquyen; // Hoặc thuộc tính nào đó trong token
       setTenDangNhap(name);
+      setTen(decodedToken.taikhoan);
       //setTenDangNhap2(decodedToken.taikhoan);
-      console.log("check", name);
+      console.log("check", decodedToken);
     }
   }, [token]);
+  //biểu đồ radar
 
   const fetchxuhuongcuacanhan = async () => {
     const response = await axios.post(
@@ -89,9 +121,10 @@ const AdminCreate = () => {
 
   const fetchSoluongNhieuNhat = async () => {
     const response = await axios.post(
-      `http://localhost:8081/api/v1/truongkhoa/laytongsoluong`,
+      `http://localhost:8081/api/v1/truongbomon/giangvien/laytongsoluong`,
       {
         TENNAMHOC: namhoc,
+        TENDANGNHAP: ten,
       }
     );
 
@@ -102,9 +135,10 @@ const AdminCreate = () => {
 
   const fetchGiangviennhieunhat = async () => {
     const response = await axios.post(
-      `http://localhost:8081/api/v1/truongkhoa/laygiangviendangkynhieunhat`,
+      `http://localhost:8081/api/v1/truongbomon/giangvien/laygiangviendangkynhieunhat`,
       {
         TENNAMHOC: namhoc,
+        TENDANGNHAP: ten,
       }
     );
 
@@ -122,6 +156,8 @@ const AdminCreate = () => {
       if (response.data.EC === 1) {
         setBomonList(response.data.DT);
         setBomon(response.data.DT[0]?.TENBOMON); // Set bộ môn mặc định (nếu có)
+        setMabomonList(response.data.DT);
+        setMabomon(response.data.DT[0]?.MABOMON); // Set bộ môn mặc định (nếu có)
       }
     } catch (error) {
       console.error("Lỗi khi lấy bộ môn", error);
@@ -146,13 +182,58 @@ const AdminCreate = () => {
     }
   };
 
-  const fetchGiangvientrongbomon = async (selectedBomon) => {
+  const fetchloaitacgia = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8081/api/v1/admin/danhmuc/loaitacgia`
+      );
+      console.log(
+        "check nè ádahaldhjashdlahdklahjdklakldakdhakdakshd",
+        response.data
+      );
+      if (response.data.EC === 1) {
+        setLoaitacgiaList(response.data.DT);
+        setLoaitacgia(response.data.DT[0]?.TEN_LOAI_TAC_GIA); // Set bộ môn mặc định (nếu có)
+      }
+    } catch (error) {
+      console.error("Lỗi khi lấy bộ môn", error);
+    }
+  };
+
+  const fetchgiangvientheotablebomon = async () => {
     try {
       const response = await axios.post(
-        `http://localhost:8081/api/v1/truongkhoa/laydanhsachgiangviendangkytheobomon/`,
+        `http://localhost:8081/api/v1/truongbomon/giangvien/laydanhsachgiangvien`,
+        {
+          TENDANGNHAP: ten,
+        }
+      );
+      console.log(
+        "check nè ádahaldhjashdlahdklahjdklakldakdhakdakshd",
+        response.data
+      );
+      if (response.data.EC === 200) {
+        setGiangvienList(response.data.DT);
+        setGiangvien(response.data.DT[0]?.TENGV); // Set bộ môn mặc định (nếu có)
+      }
+    } catch (error) {
+      console.error("Lỗi khi lấy bộ môn", error);
+    }
+  };
+
+  useEffect(() => {
+    if (ten) {
+      fetchgiangvientheotablebomon();
+    }
+  }, [ten]);
+
+  const fetchGiangvientrongbomon = async () => {
+    try {
+      const response = await axios.post(
+        `http://localhost:8081/api/v1/truongbomon/giangvien/laydanhsachgiangviendangkytheobomon`,
         {
           TENNAMHOC: namhoc,
-          TENBOMON: selectedBomon,
+          TENDANGNHAP: ten,
         }
       );
       if (response.data.EC === 200) {
@@ -163,11 +244,41 @@ const AdminCreate = () => {
       console.error("Lỗi khi fetch dữ liệu giảng viên:", error);
     }
   };
-  useEffect(() => {
-    if (bomon && namhoc) {
-      fetchGiangvientrongbomon(bomon);
+
+  const fetchDetaicanhancuatunggiangvien = async () => {
+    setLoading(true); // Bắt đầu loading
+    try {
+      const response = await axios.post(
+        `http://localhost:8081/api/v1/truongkhoa/laydanhsachtheodetaicanhan`,
+        {
+          TENNAMHOC: namhoc,
+          TENGV: giangvien,
+        }
+      );
+      if (response.data.EC === 200) {
+        console.log("Danh sách giảng viên:", response.data.DT);
+        setData(response.data.DT);
+      } else {
+        console.error("Lỗi từ API:", response.data.EM);
+      }
+    } catch (error) {
+      console.error("Lỗi khi fetch dữ liệu giảng viên:", error);
+    } finally {
+      setLoading(false); // Kết thúc loading
     }
-  }, [bomon, namhoc]);
+  };
+
+  useEffect(() => {
+    if (giangvien && namhoc) {
+      fetchDetaicanhancuatunggiangvien();
+    }
+  }, [giangvien, namhoc]);
+
+  useEffect(() => {
+    if (namhoc) {
+      fetchGiangvientrongbomon();
+    }
+  }, [namhoc]);
   const calculateTongLuyKe = (soLuongDeTai) => {
     const luyKe = [];
     soLuongDeTai.reduce((acc, curr) => {
@@ -179,7 +290,7 @@ const AdminCreate = () => {
 
   useEffect(() => {
     fetchGiangvientrongbomon();
-
+    fetchloaitacgia();
     fetchbomon();
     fetchnamhoc();
   }, []);
@@ -205,7 +316,7 @@ const AdminCreate = () => {
     },
     {
       icon: logo3,
-      title: "Tổng số lượng đề tài của khoa",
+      title: "Tổng số lượng đề tài của bộ môn",
       amount: soluong2 + ` Đề tài`,
     },
     {
@@ -490,40 +601,82 @@ const AdminCreate = () => {
   }, []);
 
   useEffect(() => {
-    // Fetch data from the API using axios
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:8081/api/v1/truongkhoa/laydanhsachtheothoigian"
-        ); // Replace with your actual API URL
-        const data = response.data;
-        if (data.EC === 200) {
-          const chartData = data.DT;
+    if (namhoc && loaitacgia) {
+      const fetchData = async () => {
+        try {
+          const response = await axios.post(
+            "http://localhost:8081/api/v1/truongkhoa/laydanhsachtheotheloaitacgia",
+            {
+              TEN_LOAI_TAC_GIA: loaitacgia,
+              TENNAMHOC: namhoc,
+            }
+          );
+          const data = response.data;
+          if (data.EC === 200) {
+            console.log("Dữ liệu từ API:", data.DT); // Kiểm tra dữ liệu từ API
+            const chartData = data.DT;
 
-          // Format the data for the Bar chart (histogram)
-          const labels = chartData.map((item) => item.GIO_QUY_DOI_KHOANG); // These are the ranges, like '0-100 giờ'
-          const counts = chartData.map((item) => item.so_luong_nghien_cuu); // The counts in each range
+            const scatterData = chartData.map((item, index) => ({
+              x: index + 1,
+              y: item.so_luong_nghien_cuu,
+              name: item.TENGV,
+            }));
 
-          setTimeChartData({
-            labels: labels,
-            datasets: [
-              {
-                label: "Số lượng nghiên cứu theo giờ quy đổi",
-                data: counts,
-                backgroundColor: "rgba(75, 192, 192, 0.5)", // Color for the bars
-                borderColor: "rgba(75, 192, 192, 1)", // Border color for the bars
-                borderWidth: 1,
-              },
-            ],
-          });
+            console.log("Dữ liệu scatterplot:", scatterData); // Kiểm tra dữ liệu chuyển đổi
+            setScatterChartData({
+              datasets: [
+                {
+                  label: "Số lượng nghiên cứu theo giảng viên",
+                  data: scatterData,
+                  backgroundColor: "rgba(75, 192, 192, 0.6)",
+                  pointBorderColor: "rgba(75, 192, 192, 1)",
+                  pointRadius: 10,
+                },
+              ],
+            });
+          }
+        } catch (error) {
+          console.error("Error fetching data:", error);
         }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
+      };
 
-    fetchData();
-  }, []);
+      fetchData();
+    }
+  }, [namhoc, loaitacgia]);
+
+  const scatteroptions = {
+    responsive: true,
+    plugins: {
+      tooltip: {
+        callbacks: {
+          label: function (context) {
+            // In toàn bộ context để kiểm tra
+            console.log("Toàn bộ context:", context);
+
+            // Lấy tên giảng viên từ dataset
+            const giangVien = context.dataset.data[context.dataIndex]?.name;
+            const soLuong = context.raw.y;
+            return `Giảng viên: ${giangVien}
+            Số lượng đề tài: ${soLuong}`;
+          },
+        },
+      },
+    },
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: "Giảng viên (theo thứ tự)",
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: "Số lượng nghiên cứu",
+        },
+      },
+    },
+  };
 
   const TimechartOptions = {
     responsive: true,
@@ -541,6 +694,16 @@ const AdminCreate = () => {
         text: "Số lượng nghiên cứu theo giờ quy đổi", // Tiêu đề của biểu đồ
       },
     },
+  };
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  // Hàm xử lý thay đổi số lượng hàng mỗi trang
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0); // Quay về trang đầu tiên khi thay đổi số lượng hàng
   };
 
   return (
@@ -868,38 +1031,8 @@ const AdminCreate = () => {
           <div className="col-5" style={{ marginBottom: "20px" }}>
             <div
               style={{
-                marginBottom: "20px",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              {/* Dropdown chọn bộ môn */}
-              <select
-                value={bomon}
-                onChange={(e) => setBomon(e.target.value)} // Cập nhật bộ môn khi thay đổi
-                style={{
-                  padding: "10px",
-                  fontSize: "16px",
-                  marginRight: "20px",
-                  borderRadius: "4px",
-                  border: "1px solid #ccc",
-                }}
-              >
-                {bomonList &&
-                  bomonList.length > 0 &&
-                  bomonList.map((item) => (
-                    <option key={item.MABOMON} value={item.TENBOMON}>
-                      {item.TENBOMON}
-                    </option>
-                  ))}
-              </select>
-            </div>
-
-            <div
-              style={{
                 width: "100%",
-                height: "500px",
+                height: "563px",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
@@ -916,25 +1049,37 @@ const AdminCreate = () => {
           <div className="col-5" style={{ marginBottom: "20px" }}>
             <div
               style={{
-                width: "100%",
-                height: "563px",
+                marginBottom: "20px",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
-                backgroundColor: "#f8f9fa",
-                borderRadius: "8px",
-                padding: "10px",
-                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
               }}
             >
-              {tacgiachartData ? (
-                <Bar data={tacgiachartData} options={options3} />
-              ) : (
-                <p>Đang tải dữ liệu...</p>
-              )}
+              {/* Dropdown chọn bộ môn */}
+              <select
+                value={loaitacgia}
+                onChange={(e) => setLoaitacgia(e.target.value)} // Cập nhật bộ môn khi thay đổi
+                style={{
+                  padding: "10px",
+                  fontSize: "16px",
+                  marginRight: "20px",
+                  borderRadius: "4px",
+                  border: "1px solid #ccc",
+                }}
+              >
+                {loaitacgiaList &&
+                  loaitacgiaList.length > 0 &&
+                  loaitacgiaList.map((item) => (
+                    <option
+                      key={item.MA_LOAI_TAC_GIA}
+                      value={item.TEN_LOAI_TAC_GIA}
+                    >
+                      {item.TEN_LOAI_TAC_GIA}
+                    </option>
+                  ))}
+              </select>
             </div>
-          </div>
-          <div className="col-5" style={{ marginBottom: "60px" }}>
+
             <div
               style={{
                 width: "100%",
@@ -948,10 +1093,100 @@ const AdminCreate = () => {
                 boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
               }}
             >
-              {timechartData ? (
-                <Bar data={timechartData} options={TimechartOptions} />
+              {/* Biểu đồ */}
+              {scatterChartData &&
+              scatterChartData.datasets &&
+              scatterChartData.datasets[0].data &&
+              scatterChartData.datasets[0].data.length > 0 ? (
+                <Scatter data={scatterChartData} options={scatteroptions} />
               ) : (
-                <p>Đang tải dữ liệu...</p>
+                <div>Loading...</div>
+              )}
+            </div>
+          </div>
+          <div className="col-5" style={{ marginBottom: "60px" }}>
+            <div
+              style={{
+                marginBottom: "20px",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              {/* Dropdown chọn bộ môn */}
+              <select
+                value={giangvien}
+                onChange={(e) => setGiangvien(e.target.value)} // Cập nhật bộ môn khi thay đổi
+                style={{
+                  padding: "10px",
+                  fontSize: "16px",
+                  marginRight: "20px",
+                  borderRadius: "4px",
+                  border: "1px solid #ccc",
+                }}
+              >
+                {giangvienList &&
+                  giangvienList.length > 0 &&
+                  giangvienList.map((item) => (
+                    <option key={item.MAGV} value={item.TENGV}>
+                      {item.TENGV}
+                    </option>
+                  ))}
+              </select>
+            </div>
+            <div
+              style={{
+                width: "100%",
+                padding: "16px",
+                backgroundColor: "#fff",
+                borderRadius: "8px",
+                boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+              }}
+            >
+              {/* Kiểm tra xem có đang load dữ liệu không và dữ liệu có rỗng không */}
+              {loading ? (
+                <div>Loading...</div> // Hiển thị loading khi đang tải
+              ) : (
+                <TableContainer
+                  style={{
+                    maxWidth: "100%", // Đảm bảo bảng không vượt quá chiều rộng
+                    overflowX: "auto", // Kích hoạt thanh cuộn ngang khi bảng dài hơn
+                    height: "531px", // Giữ chiều cao cố định
+                    overflowY: "auto", // Kích hoạt thanh cuộn dọc khi bảng dài hơn
+                  }}
+                >
+                  <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Đề Tài</TableCell>
+                        <TableCell>Năm Học</TableCell>
+                        <TableCell>Giảng Viên</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {datapage.length === 0
+                        ? // Nếu không có dữ liệu, hiển thị các hàng trống để giữ nguyên chiều cao bảng
+                          Array.from({ length: 5 }).map((_, index) => (
+                            <TableRow key={index}>
+                              <TableCell
+                                colSpan={3}
+                                style={{ textAlign: "center" }}
+                              >
+                                Không có dữ liệu
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        : // Hiển thị dữ liệu trong bảng
+                          datapage.map((row, index) => (
+                            <TableRow hover key={index}>
+                              <TableCell>{row.TEN_DE_TAI}</TableCell>
+                              <TableCell>{row.TENNAMHOC}</TableCell>
+                              <TableCell>{row.GiangVienGop}</TableCell>
+                            </TableRow>
+                          ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
               )}
             </div>
           </div>
