@@ -366,7 +366,6 @@ const createTaiKhoanExcel = async (dataTaiKhoanExcelArray) => {
 
 const LoginTaikhoan = async (tenDangnhap, matKhau) => {
   try {
-    // console.log("tenDangnhap: ", tenDangnhap)
     const checkmail = isValidEmail(tenDangnhap);
     if (!checkmail) {
       return {
@@ -393,23 +392,36 @@ const LoginTaikhoan = async (tenDangnhap, matKhau) => {
           },
         };
       }
-      // const isCorrectPass = await bcrypt.compare(matKhau, results[0].MATKHAU);
 
-      let payload = {
-        taikhoan: results[0].TENDANGNHAP,
-        //  matkhau: results[0].MATKHAU, cái này không cần mật khẩu => phúc note
-        phanquyen: results[0].PHANQUYEN,
-        trangthai: results[0].TRANGTHAITAIKHOAN,
-      };
-      let token = createJWT(payload);
-      return {
-        EM: "đăng nhập thành công",
-        EC: 1,
-        DT: {
-          access_token: token,
-          data: results,
-        },
-      };
+      const isCorrectPass = await bcrypt.compare(matKhau, results[0].MATKHAU);
+
+      if (isCorrectPass === true) {
+        let payload = {
+          taikhoan: results[0].TENDANGNHAP,
+          //  matkhau: results[0].MATKHAU, cái này không cần mật khẩu => phúc note
+          phanquyen: results[0].PHANQUYEN,
+          trangthai: results[0].TRANGTHAITAIKHOAN,
+        };
+        let token = createJWT(payload);
+
+        return {
+          EM: "đăng nhập thành công",
+          EC: 1,
+          DT: {
+            access_token: token,
+            data: results,
+          },
+        };
+      } else {
+        return {
+          EM: "Đăng nhập thất bại, mật khẩu không đúng",
+          EC: 0,
+          DT: {
+            access_token: null,
+            data: [],
+          },
+        };
+      }
     } else {
       return {
         EM: "Đăng nhập thất bại, tài khoản không đúng",

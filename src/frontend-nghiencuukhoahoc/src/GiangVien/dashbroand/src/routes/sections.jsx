@@ -19,6 +19,7 @@ const BlogPage = lazy(() => import("../pages/blog"));
 const UserPage = lazy(() => import("../pages/user"));
 const LoginPage = lazy(() => import("../pages/login"));
 const Page404 = lazy(() => import("../pages/page-not-found"));
+const PersonalStats = lazy(() => import("../sections/Thongke/Thongkecanhan"));
 
 export default function Router() {
   const routes = useRoutes([
@@ -80,7 +81,7 @@ export default function Router() {
       ),
     },
     {
-      path: "/phan-cong-cua-toi",
+      path: "/thongke",
       element: (
         <DashboardLayout>
           <Suspense
@@ -94,6 +95,7 @@ export default function Router() {
             }
           >
             {/* Component tương ứng */}
+            <PersonalStats />
           </Suspense>
         </DashboardLayout>
       ),

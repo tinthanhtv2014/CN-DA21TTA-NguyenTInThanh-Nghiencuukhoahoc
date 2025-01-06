@@ -451,7 +451,18 @@ const AdminCreate = () => {
   const data2 = {
     labels:
       xuhuong && xuhuong.length > 0
-        ? xuhuong.map((item) => item.DonViTinh + " nghiên cứu khoa học")
+        ? xuhuong.map((item) => {
+            switch (item.DonViTinh) {
+              case "Bài":
+                return "Bài báo nghiên cứu khoa học";
+              case "Thuyết minh":
+                return "Thuyết minh đề tài nghiên cứu khoa học";
+              case "Hồ sơ":
+                return "Hồ sơ cá nhân nghiên cứu khoa học";
+              default:
+                return item.DonViTinh + " nghiên cứu khoa học"; // Trường hợp mặc định
+            }
+          })
         : [], // Đơn vị tính (tạo nhãn cho các trục của radar chart)
     datasets: [
       {
@@ -814,20 +825,30 @@ const AdminCreate = () => {
     <>
       <div
         style={{
-          marginBottom: "20px",
+          marginBottom: "60px",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
         }}
       >
-        {/* Dropdown chọn bộ môn */}
+        {/* Label và Dropdown chọn năm học */}
+        <label
+          htmlFor="namhoc-select"
+          style={{
+            marginRight: "10px", // Khoảng cách giữa label và select
+            fontSize: "16px",
+            fontWeight: "bold",
+          }}
+        >
+          Chọn Năm học:
+        </label>
         <select
+          id="namhoc-select"
           value={namhoc}
-          onChange={(e) => setNamhoc(e.target.value)} // Cập nhật bộ môn khi thay đổi
+          onChange={(e) => setNamhoc(e.target.value)} // Cập nhật năm học khi thay đổi
           style={{
             padding: "10px",
             fontSize: "16px",
-            marginRight: "20px",
             borderRadius: "4px",
             border: "1px solid #ccc",
           }}
@@ -1026,16 +1047,28 @@ const AdminCreate = () => {
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
+                gap: "10px", // Khoảng cách giữa label và dropdown
               }}
             >
-              {/* Dropdown chọn bộ môn */}
+              {/* Label và Dropdown chọn bộ môn */}
+              <label
+                htmlFor="select-bomon"
+                style={{
+                  fontWeight: "bold",
+                  fontSize: "16px",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                Chọn Bộ Môn:
+              </label>
               <select
+                id="select-bomon"
                 value={bomon}
-                onChange={(e) => setBomon(e.target.value)} // Cập nhật bộ môn khi thay đổi
+                onChange={(e) => setBomon(e.target.value)}
                 style={{
                   padding: "10px",
                   fontSize: "16px",
-                  marginRight: "20px",
                   borderRadius: "4px",
                   border: "1px solid #ccc",
                 }}
@@ -1074,37 +1107,48 @@ const AdminCreate = () => {
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
+                gap: "20px", // Khoảng cách giữa các phần tử
               }}
             >
-              {/* Dropdown chọn bộ môn */}
-              <select
-                value={loaitacgia}
-                onChange={(e) => setLoaitacgia(e.target.value)} // Cập nhật bộ môn khi thay đổi
+              {/* Dropdown chọn loại tác giả */}
+              <div
                 style={{
-                  padding: "10px",
-                  fontSize: "16px",
-                  marginRight: "20px",
-                  borderRadius: "4px",
-                  border: "1px solid #ccc",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
                 }}
               >
-                {loaitacgiaList &&
-                  loaitacgiaList.length > 0 &&
-                  loaitacgiaList.map((item) => (
-                    <option
-                      key={item.MA_LOAI_TAC_GIA}
-                      value={item.TEN_LOAI_TAC_GIA}
-                    >
-                      {item.TEN_LOAI_TAC_GIA}
-                    </option>
-                  ))}
-              </select>
+                <label style={{ marginBottom: "8px", fontWeight: "bold" }}>
+                  Chọn Loại Tác Giả
+                </label>
+                <select
+                  value={loaitacgia}
+                  onChange={(e) => setLoaitacgia(e.target.value)}
+                  style={{
+                    padding: "10px",
+                    fontSize: "16px",
+                    borderRadius: "4px",
+                    border: "1px solid #ccc",
+                  }}
+                >
+                  {loaitacgiaList &&
+                    loaitacgiaList.length > 0 &&
+                    loaitacgiaList.map((item) => (
+                      <option
+                        key={item.MA_LOAI_TAC_GIA}
+                        value={item.TEN_LOAI_TAC_GIA}
+                      >
+                        {item.TEN_LOAI_TAC_GIA}
+                      </option>
+                    ))}
+                </select>
+              </div>
             </div>
 
             <div
               style={{
                 width: "100%",
-                height: "500px",
+                height: "563px",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
@@ -1132,57 +1176,70 @@ const AdminCreate = () => {
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
+                gap: "20px", // Khoảng cách giữa các dropdown
               }}
             >
               {/* Dropdown chọn bộ môn */}
-              <select
-                value={mabomon}
-                onChange={(e) => setMabomon(e.target.value)} // Cập nhật bộ môn khi thay đổi
+              <div
                 style={{
-                  padding: "10px",
-                  fontSize: "16px",
-                  marginRight: "20px",
-                  borderRadius: "4px",
-                  border: "1px solid #ccc",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
                 }}
               >
-                {mabomonList &&
-                  mabomonList.length > 0 &&
-                  mabomonList.map((item) => (
-                    <option key={item.MABOMON} value={item.MABOMON}>
-                      {item.TENBOMON}
-                    </option>
-                  ))}
-              </select>
-            </div>
-            <div
-              style={{
-                marginBottom: "20px",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              {/* Dropdown chọn bộ môn */}
-              <select
-                value={giangvien}
-                onChange={(e) => setGiangvien(e.target.value)} // Cập nhật bộ môn khi thay đổi
+                <label style={{ marginBottom: "8px", fontWeight: "bold" }}>
+                  Chọn Bộ Môn
+                </label>
+                <select
+                  value={mabomon}
+                  onChange={(e) => setMabomon(e.target.value)}
+                  style={{
+                    padding: "10px",
+                    fontSize: "16px",
+                    borderRadius: "4px",
+                    border: "1px solid #ccc",
+                  }}
+                >
+                  {mabomonList &&
+                    mabomonList.length > 0 &&
+                    mabomonList.map((item) => (
+                      <option key={item.MABOMON} value={item.MABOMON}>
+                        {item.TENBOMON}
+                      </option>
+                    ))}
+                </select>
+              </div>
+
+              {/* Dropdown chọn giảng viên */}
+              <div
                 style={{
-                  padding: "10px",
-                  fontSize: "16px",
-                  marginRight: "20px",
-                  borderRadius: "4px",
-                  border: "1px solid #ccc",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
                 }}
               >
-                {giangvienList &&
-                  giangvienList.length > 0 &&
-                  giangvienList.map((item) => (
-                    <option key={item.MAGV} value={item.TENGV}>
-                      {item.TENGV}
-                    </option>
-                  ))}
-              </select>
+                <label style={{ marginBottom: "8px", fontWeight: "bold" }}>
+                  Chọn Giảng Viên
+                </label>
+                <select
+                  value={giangvien}
+                  onChange={(e) => setGiangvien(e.target.value)}
+                  style={{
+                    padding: "10px",
+                    fontSize: "16px",
+                    borderRadius: "4px",
+                    border: "1px solid #ccc",
+                  }}
+                >
+                  {giangvienList &&
+                    giangvienList.length > 0 &&
+                    giangvienList.map((item) => (
+                      <option key={item.MAGV} value={item.TENGV}>
+                        {item.TENGV}
+                      </option>
+                    ))}
+                </select>
+              </div>
             </div>
             <div
               style={{
@@ -1196,14 +1253,12 @@ const AdminCreate = () => {
               {/* Kiểm tra xem có đang load dữ liệu không và dữ liệu có rỗng không */}
               {loading ? (
                 <div>Loading...</div> // Hiển thị loading khi đang tải
-              ) : datapage.length === 0 ? (
-                <div>Không có dữ liệu để hiển thị</div> // Hiển thị khi không có dữ liệu
               ) : (
                 <TableContainer
                   style={{
                     maxWidth: "100%", // Đảm bảo bảng không vượt quá chiều rộng
                     overflowX: "auto", // Kích hoạt thanh cuộn ngang khi bảng dài hơn
-                    maxHeight: "400px", // Giới hạn chiều cao của bảng, có thể thay đổi theo nhu cầu
+                    height: "531px", // Giữ chiều cao cố định
                     overflowY: "auto", // Kích hoạt thanh cuộn dọc khi bảng dài hơn
                   }}
                 >
@@ -1216,13 +1271,26 @@ const AdminCreate = () => {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {datapage.map((row, index) => (
-                        <TableRow hover key={index}>
-                          <TableCell>{row.TEN_DE_TAI}</TableCell>
-                          <TableCell>{row.TENNAMHOC}</TableCell>
-                          <TableCell>{row.GiangVienGop}</TableCell>
-                        </TableRow>
-                      ))}
+                      {datapage.length === 0
+                        ? // Nếu không có dữ liệu, hiển thị các hàng trống để giữ nguyên chiều cao bảng
+                          Array.from({ length: 5 }).map((_, index) => (
+                            <TableRow key={index}>
+                              <TableCell
+                                colSpan={3}
+                                style={{ textAlign: "center" }}
+                              >
+                                Không có dữ liệu
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        : // Hiển thị dữ liệu trong bảng
+                          datapage.map((row, index) => (
+                            <TableRow hover key={index}>
+                              <TableCell>{row.TEN_DE_TAI}</TableCell>
+                              <TableCell>{row.TENNAMHOC}</TableCell>
+                              <TableCell>{row.GiangVienGop}</TableCell>
+                            </TableRow>
+                          ))}
                     </TableBody>
                   </Table>
                 </TableContainer>

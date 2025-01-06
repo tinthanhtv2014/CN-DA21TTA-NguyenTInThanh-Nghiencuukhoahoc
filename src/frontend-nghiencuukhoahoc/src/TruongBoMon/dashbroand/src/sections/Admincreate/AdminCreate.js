@@ -460,7 +460,18 @@ const AdminCreate = () => {
   const data2 = {
     labels:
       xuhuong && xuhuong.length > 0
-        ? xuhuong.map((item) => item.DonViTinh + " nghiên cứu khoa học")
+        ? xuhuong.map((item) => {
+            switch (item.DonViTinh) {
+              case "Bài":
+                return "Bài báo nghiên cứu khoa học";
+              case "Thuyết minh":
+                return "Thuyết minh đề tài nghiên cứu khoa học";
+              case "Hồ sơ":
+                return "Hồ sơ cá nhân nghiên cứu khoa học";
+              default:
+                return item.DonViTinh + " nghiên cứu khoa học"; // Trường hợp mặc định
+            }
+          })
         : [], // Đơn vị tính (tạo nhãn cho các trục của radar chart)
     datasets: [
       {
@@ -823,20 +834,30 @@ const AdminCreate = () => {
     <>
       <div
         style={{
-          marginBottom: "20px",
+          marginBottom: "60px",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
         }}
       >
-        {/* Dropdown chọn bộ môn */}
+        {/* Label và Dropdown chọn năm học */}
+        <label
+          htmlFor="namhoc-select"
+          style={{
+            marginRight: "10px", // Khoảng cách giữa label và select
+            fontSize: "16px",
+            fontWeight: "bold",
+          }}
+        >
+          Chọn Năm học:
+        </label>
         <select
+          id="namhoc-select"
           value={namhoc}
-          onChange={(e) => setNamhoc(e.target.value)} // Cập nhật bộ môn khi thay đổi
+          onChange={(e) => setNamhoc(e.target.value)} // Cập nhật năm học khi thay đổi
           style={{
             padding: "10px",
             fontSize: "16px",
-            marginRight: "20px",
             borderRadius: "4px",
             border: "1px solid #ccc",
           }}
@@ -1053,31 +1074,42 @@ const AdminCreate = () => {
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
+                gap: "20px", // Khoảng cách giữa các phần tử
               }}
             >
-              {/* Dropdown chọn bộ môn */}
-              <select
-                value={loaitacgia}
-                onChange={(e) => setLoaitacgia(e.target.value)} // Cập nhật bộ môn khi thay đổi
+              {/* Dropdown chọn loại tác giả */}
+              <div
                 style={{
-                  padding: "10px",
-                  fontSize: "16px",
-                  marginRight: "20px",
-                  borderRadius: "4px",
-                  border: "1px solid #ccc",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
                 }}
               >
-                {loaitacgiaList &&
-                  loaitacgiaList.length > 0 &&
-                  loaitacgiaList.map((item) => (
-                    <option
-                      key={item.MA_LOAI_TAC_GIA}
-                      value={item.TEN_LOAI_TAC_GIA}
-                    >
-                      {item.TEN_LOAI_TAC_GIA}
-                    </option>
-                  ))}
-              </select>
+                <label style={{ marginBottom: "8px", fontWeight: "bold" }}>
+                  Chọn Loại Tác Giả
+                </label>
+                <select
+                  value={loaitacgia}
+                  onChange={(e) => setLoaitacgia(e.target.value)}
+                  style={{
+                    padding: "10px",
+                    fontSize: "16px",
+                    borderRadius: "4px",
+                    border: "1px solid #ccc",
+                  }}
+                >
+                  {loaitacgiaList &&
+                    loaitacgiaList.length > 0 &&
+                    loaitacgiaList.map((item) => (
+                      <option
+                        key={item.MA_LOAI_TAC_GIA}
+                        value={item.TEN_LOAI_TAC_GIA}
+                      >
+                        {item.TEN_LOAI_TAC_GIA}
+                      </option>
+                    ))}
+                </select>
+              </div>
             </div>
 
             <div
@@ -1107,20 +1139,20 @@ const AdminCreate = () => {
           <div className="col-5" style={{ marginBottom: "60px" }}>
             <div
               style={{
-                marginBottom: "20px",
                 display: "flex",
-                justifyContent: "center",
+                flexDirection: "column",
                 alignItems: "center",
               }}
             >
-              {/* Dropdown chọn bộ môn */}
+              <label style={{ marginBottom: "8px", fontWeight: "bold" }}>
+                Chọn Giảng Viên
+              </label>
               <select
                 value={giangvien}
-                onChange={(e) => setGiangvien(e.target.value)} // Cập nhật bộ môn khi thay đổi
+                onChange={(e) => setGiangvien(e.target.value)}
                 style={{
                   padding: "10px",
                   fontSize: "16px",
-                  marginRight: "20px",
                   borderRadius: "4px",
                   border: "1px solid #ccc",
                 }}
@@ -1151,7 +1183,7 @@ const AdminCreate = () => {
                   style={{
                     maxWidth: "100%", // Đảm bảo bảng không vượt quá chiều rộng
                     overflowX: "auto", // Kích hoạt thanh cuộn ngang khi bảng dài hơn
-                    height: "531px", // Giữ chiều cao cố định
+                    height: "551px", // Giữ chiều cao cố định
                     overflowY: "auto", // Kích hoạt thanh cuộn dọc khi bảng dài hơn
                   }}
                 >

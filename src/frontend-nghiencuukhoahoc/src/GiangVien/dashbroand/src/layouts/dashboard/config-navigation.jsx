@@ -16,8 +16,8 @@ const navConfig = [
     icon: icon("ic_analytics"),
   },
   {
-    title: "Phân công của tôi",
-    path: "/phan-cong-cua-toi",
+    title: "Thống kê cá nhân",
+    path: "/thongke",
     icon: icon("ic_user"),
   },
   {

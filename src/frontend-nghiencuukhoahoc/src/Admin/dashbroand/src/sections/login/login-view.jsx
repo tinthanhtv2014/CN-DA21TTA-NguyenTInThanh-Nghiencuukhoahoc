@@ -85,7 +85,7 @@ export default function LoginView() {
             } catch (err) {
               console.error("Error decoding token:", err);
             }
-          } else {
+          } else if (response.data.EC === 0) {
             toast.error("Đăng nhập thất bại");
           }
         })
