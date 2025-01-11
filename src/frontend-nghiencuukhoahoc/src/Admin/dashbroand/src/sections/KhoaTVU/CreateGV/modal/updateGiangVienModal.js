@@ -77,104 +77,40 @@ const UpdateGiangVienModal = ({
 
       // Kiểm tra ngày tháng (đảm bảo không phải ngày trong tương lai)
       const today = new Date();
-      const timeChucVuDate = new Date(TimeChucVu);
-      const timeChucDanhDate = new Date(TimeChucDanh);
-
-      if (timeChucVuDate > today) {
+      if (TimeChucVu && new Date(TimeChucVu) > today) {
         alert("Ngày nhận chức vụ phải là ngày trong quá khứ.");
         return;
       }
-
-      if (timeChucDanhDate > today) {
+      if (TimeChucDanh && new Date(TimeChucDanh) > today) {
         alert("Thời gian nhận chức danh phải là ngày trong quá khứ.");
         return;
       }
 
-      // Lấy giá trị thuộc tính từ lecturerData và kiểm tra null
-      const thoigianNhan = lecturerData.THOIGIANNHAN
-        ? lecturerData.THOIGIANNHAN.split("T")[0]
-        : null;
-      const tenChucDanh = lecturerData.TENCHUCDANH || "";
-      const tuNgay = lecturerData.TUNGAY
-        ? lecturerData.TUNGAY.split("T")[0]
-        : null;
-      const tenChucVu = lecturerData.TENCHUCVU || "";
-      const soQuyetDinh = lecturerData.SOQUYETDINH || "";
+      // Tạo object cập nhật dựa trên các trường có giá trị thay đổi
+      const updatedData = {
+        ...(tenGV && { TENGV: tenGV }),
+        ...(diaChiGiangVien && { DIACHI: diaChiGiangVien }),
+        ...(SodienthoaiGV && { DIENTHOAI: SodienthoaiGV }),
+        ...(ChucDanhGiangVien && { TENCHUCDANH: ChucDanhGiangVien }),
+        ...(chucVuGiangVien && { TENCHUCVU: chucVuGiangVien }),
+        ...(PhanQuyenGiangVien && { PHANQUYEN: PhanQuyenGiangVien }),
+        ...(tenDangNhapGV && { TENDANGNHAP: tenDangNhapGV }),
+        ...(TenBoMon && { TENBOMON: TenBoMon }),
+        ...(TrangThaiDangNhap && { TRANGTHAITAIKHOAN: TrangThaiDangNhap }),
+        ...(TimeChucDanh && { THOIGIANNHAN: TimeChucDanh }),
+        ...(TimeChucVu && { TUNGAY: TimeChucVu }),
+        ...(SoQuyetDinh && { SOQUYETDINH: SoQuyetDinh }),
+      };
 
-      // Kiểm tra sự thay đổi của thời gian nhận chức danh và tên chức danh
-      if (TimeChucDanh !== thoigianNhan && ChucDanhGiangVien !== tenChucDanh) {
-        // Nếu có thay đổi, cho phép cập nhật
-        const updatedData = {
-          TENGV: tenGV,
-          DIACHI: diaChiGiangVien,
-          DIENTHOAI: SodienthoaiGV,
-          TENCHUCDANH: ChucDanhGiangVien,
-          TENCHUCVU: chucVuGiangVien,
-          PHANQUYEN: PhanQuyenGiangVien,
-          TENDANGNHAP: tenDangNhapGV,
-          TENBOMON: TenBoMon,
-          TRANGTHAITAIKHOAN: TrangThaiDangNhap,
-          isOpenGetAllApiGV: isOpenGetAllApiGV,
-          THOIGIANNHAN: TimeChucDanh,
-          TUNGAY: TimeChucVu,
-          SOQUYETDINH: SoQuyetDinh,
-        };
-        updateLecturer(updatedData);
-      } else if (
-        TimeChucDanh !== thoigianNhan ||
-        ChucDanhGiangVien !== tenChucDanh
-      ) {
-        toast.error("Muốn update thời gian thì phải update tên chức danh");
+      // Kiểm tra nếu không có thay đổi gì thì thông báo
+      if (Object.keys(updatedData).length === 0) {
+        alert("Không có thay đổi nào để cập nhật.");
         return;
-      } else if (
-        TimeChucVu !== tuNgay &&
-        chucVuGiangVien !== tenChucVu &&
-        SoQuyetDinh !== soQuyetDinh
-      ) {
-        // Nếu có thay đổi, cho phép cập nhật
-        const updatedData = {
-          TENGV: tenGV,
-          DIACHI: diaChiGiangVien,
-          DIENTHOAI: SodienthoaiGV,
-          TENCHUCDANH: ChucDanhGiangVien,
-          TENCHUCVU: chucVuGiangVien,
-          PHANQUYEN: PhanQuyenGiangVien,
-          TENDANGNHAP: tenDangNhapGV,
-          TENBOMON: TenBoMon,
-          TRANGTHAITAIKHOAN: TrangThaiDangNhap,
-          isOpenGetAllApiGV: isOpenGetAllApiGV,
-          THOIGIANNHAN: TimeChucDanh,
-          TUNGAY: TimeChucVu,
-          SOQUYETDINH: SoQuyetDinh,
-        };
-        updateLecturer(updatedData);
-      } else if (
-        TimeChucVu !== tuNgay ||
-        chucVuGiangVien !== tenChucVu ||
-        SoQuyetDinh !== soQuyetDinh
-      ) {
-        toast.error(
-          "Muốn update thì phải cập nhật cả thời gian, tên chức vụ và số quyết định"
-        );
-        return;
-      } else {
-        const updatedData = {
-          TENGV: tenGV,
-          DIACHI: diaChiGiangVien,
-          DIENTHOAI: SodienthoaiGV,
-          TENCHUCDANH: ChucDanhGiangVien,
-          TENCHUCVU: chucVuGiangVien,
-          PHANQUYEN: PhanQuyenGiangVien,
-          TENDANGNHAP: tenDangNhapGV,
-          TENBOMON: TenBoMon,
-          TRANGTHAITAIKHOAN: TrangThaiDangNhap,
-          isOpenGetAllApiGV: isOpenGetAllApiGV,
-          THOIGIANNHAN: TimeChucDanh,
-          TUNGAY: TimeChucVu,
-          SOQUYETDINH: SoQuyetDinh,
-        };
-        updateLecturer(updatedData);
       }
+
+      // Gọi hàm cập nhật với dữ liệu đã chuẩn bị
+      updateLecturer(updatedData);
+      alert("Cập nhật thành công!");
     } catch (error) {
       console.error("Đã xảy ra lỗi khi cập nhật giảng viên:", error);
       alert("Đã xảy ra lỗi. Vui lòng thử lại sau.");

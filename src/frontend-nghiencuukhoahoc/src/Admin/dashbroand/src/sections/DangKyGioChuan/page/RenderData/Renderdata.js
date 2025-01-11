@@ -60,9 +60,11 @@ const RenderData = ({
           if (response.data.EC === 1 && response.data.DT) {
             // Tìm phần tử có GHICHU là "CHONKHUNG"
             const matchedItem = response.data.DT.find(
-              (item) => item.GHICHU === "CHONKHUNG"
+              (item) =>
+                item.GHICHU === "CHONKHUNG" &&
+                item.TEN_KHOA === "Khoa Kỹ Thuật Công Nghệ"
             );
-
+            console.log("check matchedItem", matchedItem);
             if (matchedItem) {
               // Nếu tìm thấy, cập nhật các giá trị cần thiết
               setStartTime(matchedItem.THOIGIANBATDAU);

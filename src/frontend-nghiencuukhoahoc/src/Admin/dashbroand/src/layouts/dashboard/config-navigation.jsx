@@ -31,16 +31,16 @@ const navConfig = [
   //   path: '/quan-ly-chuc-danh',
   //   icon: icon('ic_blog'),
   // },
-  {
-    title: "Quản Lý Lớp Học",
-    path: "/quan-ly-lop-hoc",
-    icon: icon("ic_blog"),
-  },
-  {
-    title: "Chương Trình Học",
-    path: "/chuong-trinh-dao-tao",
-    icon: icon("ic_blog"),
-  },
+  // {
+  //   title: "Quản Lý Lớp Học",
+  //   path: "/quan-ly-lop-hoc",
+  //   icon: icon("ic_blog"),
+  // },
+  // {
+  //   title: "Chương Trình Học",
+  //   path: "/chuong-trinh-dao-tao",
+  //   icon: icon("ic_blog"),
+  // },
 
   {
     title: "Đăng Ký Khung Giờ Chuẩn",

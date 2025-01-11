@@ -480,7 +480,7 @@ const ComponenCreateGiangVien = () => {
             selectBoMon={selectBoMon}
           />
         </Col>{" "}
-        <Col md={2}>
+        {/* <Col md={2}>
           {" "}
           <Box sx={{ maxWidth: 300 }}>
             <FormControl fullWidth>
@@ -509,7 +509,7 @@ const ComponenCreateGiangVien = () => {
               </Select>{" "}
             </FormControl>
           </Box>
-        </Col>
+        </Col> */}
         <Col md={3}>
           <div className="mb-3">
             <input
@@ -562,7 +562,7 @@ const ComponenCreateGiangVien = () => {
           />
         </Col>
       </Row>
-      <Row>
+      {/* <Row>
         <Col md={6}>
           {" "}
           <h5 className="mt-4">Thêm Tài Khoản Giảng Viên</h5>
@@ -587,8 +587,8 @@ const ComponenCreateGiangVien = () => {
           </Box>
         </Col>
         <Col md={6}></Col>
-      </Row>
-      <Row className="">
+      </Row> */}
+      {/* <Row className="">
         {" "}
         {ValueExcel &&
           (ValueExcel === "Excel" ? (
@@ -621,7 +621,7 @@ const ComponenCreateGiangVien = () => {
             </>
           ))}
         <Col md={6}></Col>
-      </Row>{" "}
+      </Row>{" "} */}
       <Row>
         <Col md={12}>
           <GiangVienList
